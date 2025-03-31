@@ -88,13 +88,13 @@ carrie@ubuntu:~/lockboxes$ cat main_0.py
 canUnlockAll = __import__('0-lockboxes').canUnlockAll
 
 boxes = [[1], [2], [3], [4], []]
-print(canUnlockAll(boxes))
+print(canUnlockAll(boxes)) # True
 
 boxes = [[1, 4, 6], [2], [0, 4, 1], [5, 6, 2], [3], [4, 1], [6]]
-print(canUnlockAll(boxes))
+print(canUnlockAll(boxes)) # True
 
 boxes = [[1, 4], [2], [0, 4, 1], [3], [], [4, 1], [5, 6]]
-print(canUnlockAll(boxes))
+print(canUnlockAll(boxes)) # False
 
 carrie@ubuntu:~/lockboxes$
 ```
@@ -128,3 +128,16 @@ holbertonschool-interview/
 
 **Directory:** `lockboxes`
 **File:** `0-lockboxes.py`
+
+me
+attention bien mettre LF au lieu bde CRLF
+```bash
+root@UID7E:/mnt/c/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/lockboxes# ./main_0.py
+True
+True
+False
+root@UID7E:/mnt/c/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/lockboxes# python3 main_0.py
+True
+True
+False
+```

@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 """
 Module to determine if all boxes can be opened.
 """
