@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 """
 Module to determine if all boxes can be opened.
 """
@@ -10,7 +9,6 @@ def canUnlockAll(boxes):
     :param boxes: List of lists containing keys for each box
     :return: True if all boxes can be opened, else False
     """
-
     if not isinstance(boxes, list) or not boxes:
         return False
 
@@ -25,3 +23,4 @@ def canUnlockAll(boxes):
             keys.update(boxes[key])
 
     return len(opened) == n
+
