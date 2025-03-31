@@ -10,6 +10,7 @@ def canUnlockAll(boxes):
     :param boxes: List of lists containing keys for each box
     :return: True if all boxes can be opened, else False
     """
+
     if not isinstance(boxes, list) or not boxes:
         return False
 
