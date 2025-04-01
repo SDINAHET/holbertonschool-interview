@@ -53,6 +53,57 @@
 #           echo "carrie@ubuntu:~/lockboxes$ python3 main_checker.py"
 #           ./lockboxes/main_checker.py
 
+# name: Lockboxes CI
+
+# on:
+#   push:
+#     paths:
+#       - 'lockboxes/**'
+#   pull_request:
+#     paths:
+#       - 'lockboxes/**'
+
+# jobs:
+#   run-tests:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v3
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.8'
+
+#       - name: Install pycodestyle
+#         run: pip install pycodestyle
+
+#       - name: Check PEP8 compliance
+#         run: pycodestyle lockboxes/0-lockboxes.py
+
+#       - name: Check README.md exists and is not empty
+#         run: |
+#           test -f lockboxes/README.md && [ -s lockboxes/README.md ]
+
+#       - name: Check for shebang and module doc
+#         run: |
+#           head -n 1 lockboxes/0-lockboxes.py | grep -q '#!/usr/bin/python3'
+#           grep -q '"""' lockboxes/0-lockboxes.py
+
+#       - name: Make main_0.py executable
+#         run: chmod +x lockboxes/main_0.py
+
+#       - name: Run basic test cases - main_0.py
+#         run: |
+#           echo "carrie@ubuntu:~/lockboxes$ ./main_0.py"
+#           ./lockboxes/main_0.py
+
+#       - name: Run advanced test cases - main_checker.py
+#         run: |
+#           echo "carrie@ubuntu:~/lockboxes$ python3 main_checker.py"
+#           python3 lockboxes/main_checker.py
+
 name: Lockboxes CI
 
 on:
@@ -71,12 +122,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
           python-version: '3.8'
 
-      - name: Install pycodestyle
+      - name: Install pycodestyle (PEP8)
         run: pip install pycodestyle
 
       - name: Check PEP8 compliance
@@ -84,22 +135,31 @@ jobs:
 
       - name: Check README.md exists and is not empty
         run: |
-          test -f lockboxes/README.md && [ -s lockboxes/README.md ]
+          if [ ! -s lockboxes/README.md ]; then
+            echo "❌ README.md is missing or empty"
+            exit 1
+          else
+            echo "✅ README.md exists and is not empty"
+          fi
 
       - name: Check for shebang and module doc
         run: |
-          head -n 1 lockboxes/0-lockboxes.py | grep -q '#!/usr/bin/python3'
-          grep -q '"""' lockboxes/0-lockboxes.py
-
-      - name: Make main_0.py executable
-        run: chmod +x lockboxes/main_0.py
+          if ! grep -q '#!/usr/bin/python3' lockboxes/0-lockboxes.py; then
+            echo "❌ Missing shebang"
+            exit 1
+          fi
+          if ! grep -q '"""' lockboxes/0-lockboxes.py; then
+            echo "❌ Missing docstring"
+            exit 1
+          fi
+          echo "✅ Shebang and docstring present"
 
       - name: Run basic test cases - main_0.py
         run: |
-          echo "carrie@ubuntu:~/lockboxes$ ./main_0.py"
-          ./lockboxes/main_0.py
+          echo "carrie@ubuntu:~/lockboxes$ python3 main_0.py"
+          python3 lockboxes/main_0.py
 
-      - name: Run advanced test cases - main_checker.py
+      - name: Run advanced test suite - main_checker.py
         run: |
           echo "carrie@ubuntu:~/lockboxes$ python3 main_checker.py"
           python3 lockboxes/main_checker.py
