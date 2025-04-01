@@ -33,7 +33,9 @@
 #     print(f"Case {i}: {canUnlockAll(boxes)}")
 
 #!/usr/bin/python3
-from 0-lockboxes import canUnlockAll  # ou utilise __import__ si besoin
+
+canUnlockAll = __import__('0-lockboxes').canUnlockAll
+# from 0-lockboxes import canUnlockAll  # ou utilise __import__ si besoin
 
 test_cases = [
     # (boxes, expected_result)
