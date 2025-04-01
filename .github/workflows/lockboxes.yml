@@ -1,68 +1,14 @@
-# name: Lockboxes CI
-
-# on:
-#   push:
-#     paths:
-#       - 'lockboxes/**'
-#     # branches: [main]
-#   pull_request:
-#     paths:
-#       - 'lockboxes/**'
-#     # branches: [main]
-# jobs:
-#   run-tests:
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       - name: Checkout repo
-#         uses: actions/checkout@v3
-
-#       - name: Set up Python
-#         uses: actions/setup-python@v4
-#         with:
-#           python-version: '3.8'
-
-#       - name: Install pycodestyle
-#         run: pip install pycodestyle
-
-#       - name: Check PEP8 compliance
-#         run: pycodestyle lockboxes/0-lockboxes.py
-
-#       - name: Check README.md exists and is not empty
-#         run: |
-#           test -f lockboxes/README.md && [ -s lockboxes/README.md ]
-
-#       - name: Check for shebang and module doc
-#         run: |
-#           head -n 1 lockboxes/0-lockboxes.py | grep -q '#!/usr/bin/python3'
-#           grep -q '"""' lockboxes/0-lockboxes.py
-
-#       - name: Make main_0.py executable
-#         run: chmod +x lockboxes/main_0.py
-
-#       - name: Run basic test cases - main_0.py
-#         run: |
-#           echo "carrie@ubuntu:~/lockboxes$ ./main_0.py"
-#           ./lockboxes/main_0.py
-
-#       - name: Make main_checker.py executable
-#         run: chmod +x lockboxes/main_checker.py
-
-#       - name: Run advanced test cases - main_checker.py
-#         run: |
-#           echo "carrie@ubuntu:~/lockboxes$ python3 main_checker.py"
-#           ./lockboxes/main_checker.py
-
 name: Lockboxes CI
 
 on:
   push:
     paths:
       - 'lockboxes/**'
+    # branches: [main]
   pull_request:
     paths:
       - 'lockboxes/**'
-
+    # branches: [main]
 jobs:
   run-tests:
     runs-on: ubuntu-latest
@@ -99,10 +45,64 @@ jobs:
           echo "carrie@ubuntu:~/lockboxes$ ./main_0.py"
           ./lockboxes/main_0.py
 
+      - name: Make main_checker.py executable
+        run: chmod +x lockboxes/main_checker.py
+
       - name: Run advanced test cases - main_checker.py
         run: |
           echo "carrie@ubuntu:~/lockboxes$ python3 main_checker.py"
-          python3 lockboxes/main_checker.py
+          ./lockboxes/main_checker.py
+
+# name: Lockboxes CI
+
+# on:
+#   push:
+#     paths:
+#       - 'lockboxes/**'
+#   pull_request:
+#     paths:
+#       - 'lockboxes/**'
+
+# jobs:
+#   run-tests:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout repo
+#         uses: actions/checkout@v3
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.8'
+
+#       - name: Install pycodestyle
+#         run: pip install pycodestyle
+
+#       - name: Check PEP8 compliance
+#         run: pycodestyle lockboxes/0-lockboxes.py
+
+#       - name: Check README.md exists and is not empty
+#         run: |
+#           test -f lockboxes/README.md && [ -s lockboxes/README.md ]
+
+#       - name: Check for shebang and module doc
+#         run: |
+#           head -n 1 lockboxes/0-lockboxes.py | grep -q '#!/usr/bin/python3'
+#           grep -q '"""' lockboxes/0-lockboxes.py
+
+#       - name: Make main_0.py executable
+#         run: chmod +x lockboxes/main_0.py
+
+#       - name: Run basic test cases - main_0.py
+#         run: |
+#           echo "carrie@ubuntu:~/lockboxes$ ./main_0.py"
+#           ./lockboxes/main_0.py
+
+#       - name: Run advanced test cases - main_checker.py
+#         run: |
+#           echo "carrie@ubuntu:~/lockboxes$ python3 main_checker.py"
+#           python3 lockboxes/main_checker.py
 
 # name: Lockboxes CI
 
