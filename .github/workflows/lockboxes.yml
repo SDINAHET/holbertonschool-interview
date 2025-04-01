@@ -50,5 +50,6 @@ jobs:
 
       - name: Run advanced test cases - main_1.py
         run: |
-          echo "carrie@ubuntu:~/lockboxes$ ./main_1.py"
+          # echo "carrie@ubuntu:~/lockboxes$ ./main_1.py"
+          echo "carrie@ubuntu:~/lockboxes$ python3 main_1.py"
           ./lockboxes/main_1.py
