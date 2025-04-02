@@ -298,7 +298,8 @@ for i, (boxes, expected, description) in enumerate(test_cases, 1):
     print(result)  # 🔥 Ajouté ici pour afficher True ou False comme dans l'exemple
     status = "✅" if result == expected else "❌"
     print(f"{description} — Test {i}: Expected {expected}, got {result} → {status}")
-    print()  # Ajoute une ligne vide après chaque test
+    # print()  # Ajoute une ligne vide après chaque test
+    print("-" * 40)  # ligne de séparation visuelle
     if result == expected:
         success += 1
 
