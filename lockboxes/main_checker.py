@@ -213,19 +213,24 @@ readme_path = "lockboxes/README.md"
 source_path = "lockboxes/0-lockboxes.py"
 
 print('Correction of "0. Lockboxes"\n')
+print("-" * 40)  # ligne de séparation visuelle
 
 # README.md check
 if os.path.isfile(readme_path) and os.path.getsize(readme_path) > 0:
     print("README.md exists and is not empty ✅")
+    print("-" * 40)  # ligne de séparation visuelle
 else:
     print("README.md missing or empty ❌")
+    print("-" * 40)  # ligne de séparation visuelle
     sys.exit(1)
 
 # Fichier présent
 if os.path.isfile(source_path):
     print("File is present ✅")
+    print("-" * 40)  # ligne de séparation visuelle
 else:
     print("File is missing ❌")
+    print("-" * 40)  # ligne de séparation visuelle
     sys.exit(1)
 
 # Shebang
@@ -233,18 +238,28 @@ with open(source_path) as f:
     first_line = f.readline()
     if first_line.strip() == "#!/usr/bin/python3":
         print("First line contains #!/usr/bin/python3 ✅")
+        print("-" * 40)  # ligne de séparation visuelle
     else:
         print("Shebang line is incorrect ❌")
+        print("-" * 40)  # ligne de séparation visuelle
         sys.exit(1)
 
 # Docstring
 with open(source_path) as f:
     content = f.read()
     if '"""' in content:
-        print("Module is documented ✅\n")
+        # print("Module is documented ✅\n")
+        print("Module is documented ✅")
+        print("-" * 40)  # ligne de séparation visuelle
     else:
         print("No module docstring found ❌")
+        print("-" * 40)  # ligne de séparation visuelle
         sys.exit(1)
+        
+print("-" * 40)  # ligne de séparation visuelle
+print("-" * 40)  # ligne de séparation visuelle
+print("Tests Case Holberton! ❓")
+print("-" * 40)  # ligne de séparation visuelle
 
 # Liste des cas de test avec résultats attendus et descriptions
 test_cases = [
