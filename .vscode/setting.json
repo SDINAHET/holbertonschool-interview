@@ -1,0 +1,110 @@
+{
+    "workbench.colorTheme": "Monokai",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.startupEditor": "none",
+
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4,
+    "editor.renderWhitespace": "boundary",
+    "editor.rulers": [],
+
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "files.autoSave": "afterDelay",
+
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+
+    "git.autofetch": true,
+    "git.enableSmartCommit": true,
+    "git.openRepositoryInParentFolders": "always",
+    "git.confirmSync": false,
+
+    "terminal.integrated.defaultProfile.windows": "Ubuntu (WSL)",
+    "terminal.integrated.sendKeybindingsToShell": true,
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        },
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\Sysnative\\cmd.exe",
+                "${env:windir}\\System32\\cmd.exe"
+            ],
+            "icon": "terminal-cmd"
+        },
+        "Git Bash": {
+            "source": "Git Bash"
+        },
+        "Ubuntu (WSL)": {
+            "path": "C:\\WINDOWS\\System32\\wsl.exe",
+            "args": ["-d", "Ubuntu"]
+        }
+    },
+
+    "remote.WSL.downloadInBackground": false,
+    "remote.autoForwardPortsSource": "hybrid",
+
+    "cmake.configureOnOpen": true,
+    "makefile.configureOnOpen": true,
+
+    "C/C++ Include Guard.Macro Type": "Filename",
+    "C/C++ Include Guard.Remove Extension": false,
+
+    "workbench.colorCustomizations": {
+        "editorWhitespace.foreground": "#cecdcd69"
+    },
+
+    "[c]": {
+        "editor.rulers": [80],
+        "editor.insertSpaces": false,
+        "editor.wordBasedSuggestions": "off",
+        "editor.suggest.insertMode": "replace",
+        "editor.semanticHighlighting.enabled": true,
+        "editor.defaultFormatter": "ms-vscode.cpptools"
+    },
+
+    "[python]": {
+        "editor.rulers": [79],
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4
+    },
+
+    "[javascript]": {
+        "editor.rulers": [79],
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2
+    },
+
+    "[html]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.renderWhitespace": "none"
+    },
+
+    "[css]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 4,
+        "editor.renderWhitespace": "none"
+    },
+
+    "[markdown]": {
+        "editor.wordWrap": "on",
+        "editor.quickSuggestions": false,
+        "editor.renderWhitespace": "none"
+    },
+
+    "markdown-preview-enhanced.enablePreviewZenMode": false,
+    "markdown-preview-enhanced.previewTheme": "github-light.css",
+    "markdown-preview-enhanced.codeBlockTheme": "github-dark.css",
+    "markdown-preview-enhanced.revealjsTheme": "moon.css",
+
+    "python.defaultInterpreterPath": "/usr/local/lib/python3",
+    "python.analysis.extraPaths": [
+        "/usr/local/lib/python3.10/dist-packages"
+    ],
+
+    "database-client.autoSync": true
+}
