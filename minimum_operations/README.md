@@ -83,15 +83,67 @@ Factorisation de 9 = 3 × 3
 
 ## ✅ Tests du checker (explication)
 ```bash
-| Entrée        | Sortie attendue | Explication                                                              |
-|---------------|------------------|---------------------------------------------------------------------------|
-| 21            | 10               | 21 = 3 × 7 → 3 + 7 = 10 opérations                                       |
-| 19170307      | 19170307         | Nombre premier → il faudra n opérations (1 copy + n-1 paste)            |
-| 972           | 21               | 972 = 2 × 2 × 3 × 3 × 3 × 3 × 3 → 2+2+3+3+3+3+3 = 21                     |
-| 1             | 0                | Déjà 1 H, aucune opération nécessaire                                   |
-| 0 ou -12      | 0                | Impossible → retour 0                                                   |
-| 2147483640    | ✓ correcte       | Un très grand nombre, mais bien factorisé → toujours fonctionnel        |
+| Entrée        | Sortie attendue | Explication                                                                                     |
+|---------------|------------------|--------------------------------------------------------------------------------------------------|
+| 4             | 4                | 4 = 2 × 2 → 2 + 2 = 4 opérations (Copy All + Paste → 2, Copy All + Paste → 4)                   |
+| 7             | 7                | Nombre premier → 1 Copy All + 6 Paste = 7 opérations                                            |
+| 9             | 6                | 9 = 3 × 3 → 3 + 3 = 6 opérations <br>Ex : H → Copy + Paste + Paste = 3 → Copy + Paste + Paste = 9 |
+| 12            | 7                | 12 = 2 × 2 × 3 → 2 + 2 + 3 = 7 opérations <br>Ex : 1 → 2 → 4 → 12 avec 3 Copy All et 4 Paste     |
+| 21            | 10               | 21 = 3 × 7 → 3 + 7 = 10 opérations                                                               |
+| 19170307      | 19170307         | Nombre premier → il faudra n opérations (1 Copy + n-1 Paste)                                    |
+| 972           | 21               | 972 = 2 × 2 × 3 × 3 × 3 × 3 × 3 → 2+2+3+3+3+3+3 = 21                                             |
+| 1             | 0                | Déjà 1 H, aucune opération nécessaire                                                           |
+| 0 ou -12      | 0                | Impossible → retour 0                                                                           |
+| 2147483640    | ✓ correcte       | Un très grand nombre, mais bien factorisé → toujours fonctionnel                                |
 
+```
+## 🧪 Exemples développés
+
+voici le détail pas-à-pas pour atteindre exactement 4 et 7 caractères H en utilisant uniquement Copy All et Paste, comme demandé.
+
+n = 4
+
+Objectif : avoir exactement 4 lettres H
+```text
+H                (1 caractère initial)
+Copy All         (opération 1)
+Paste            → HH                (opération 2)
+Copy All         (opération 3)
+Paste            → HHHH              (opération 4)
+
+Nombre d’opérations : 4
+Décomposition en facteurs : 4 = 2 × 2
+On fait une multiplication par 2 deux fois (chaque fois : Copy + Paste)
+On fait une multiplication par 2 deux fois (chaque fois : Copy + Paste)
+```
+
+n = 7
+
+Objectif : avoir exactement 7 lettres H
+```text
+H                (1 caractère initial)
+Copy All         (opération 1)
+Paste            → HH                (opération 2)
+Paste            → HHH               (opération 3)
+Paste            → HHHH              (opération 4)
+Paste            → HHHHH             (opération 5)
+Paste            → HHHHHH            (opération 6)
+Paste            → HHHHHHH           (opération 7)
+
+Nombre d’opérations : 7
+Décomposition en facteurs : 7 est premier → impossible de factoriser
+ Seule stratégie : faire 1 Copy, puis 6 Paste
+```
+
+n = 9
+```text
+H → Copy All → Paste → HH → Paste → HHH → Copy All → Paste → HHHHHH → Paste → HHHHHHHHH
+Nombre d’opérations : 6
+```
+n = 12
+```text
+H → Copy All → Paste → HH → Copy All → Paste → HHHH → Copy All → Paste → HHHHHHHHHHHH
+Nombre d’opérations : 7
 ```
 
 ## 🧼 PEP8
