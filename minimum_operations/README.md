@@ -6,7 +6,7 @@ Voyons ce que fait exactement ce script Python, ligne par ligne, et comment il r
 ```python
 #!/usr/bin/python3
 ```
-👉 Shebang : permet d’exécuter le fichier directement en ligne de commande (ex : ./0-minoperations.py) en utilisant l’interpréteur Python3.
+## 👉 Shebang : permet d’exécuter le fichier directement en ligne de commande (ex : ./0-minoperations.py) en utilisant l’interpréteur Python3.
 
 ```python
 """
@@ -73,7 +73,7 @@ Réduit n en divisant par ce factor.
 ```python
         factor += 1
 ```
-👉 On passe au prochain facteur possible.
+## 👉 On passe au prochain facteur possible.
 
 ## ✅ Exemple : minOperations(9)
 Factorisation de 9 = 3 × 3
