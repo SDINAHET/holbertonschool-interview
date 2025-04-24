@@ -82,6 +82,7 @@ Factorisation de 9 = 3 × 3
 → Total = 6 opérations
 
 ## ✅ Tests du checker (explication)
+```bash
 Entrée	Sortie attendue	Explication
 21	10	21 = 3 × 7 → 3 + 7 = 10 opérations
 19170307	19170307	Nombre premier → il faudra n opérations (1 copy + n-1 paste)
@@ -89,7 +90,9 @@ Entrée	Sortie attendue	Explication
 1	0	Déjà 1 H, aucune opération nécessaire
 0 ou -12	0	Impossible → retour 0
 2147483640	``✓ correcte`	Un très grand nombre, mais bien factorisé → toujours fonctionnel
-🧼 PEP8
+```
+
+## 🧼 PEP8
 Le script est bien formaté.
 
 Pas de ligne trop longue.
