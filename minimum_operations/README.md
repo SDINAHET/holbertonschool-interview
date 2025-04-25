@@ -8,6 +8,8 @@ Voyons ce que fait exactement ce script Python, ligne par ligne, et comment il r
 ```
 ## 👉 Shebang : permet d’exécuter le fichier directement en ligne de commande (ex : ./0-minoperations.py) en utilisant l’interpréteur Python3.
 
+
+
 ```python
 """
 Calculates the fewest number of operations needed
@@ -18,6 +20,8 @@ Copy All and Paste operations.
 
 ## 👉 Docstring de module : Description du but du fichier (obligatoire pour valider avec le checker Holberton).
 
+
+
 ```python
 def minOperations(n):
     """
@@ -27,6 +31,8 @@ def minOperations(n):
 ```
 
 ## 👉 Docstring de fonction : Explique ce que fait la fonction minOperations.
+
+
 
 📐 La logique interne :
 ```python
@@ -43,6 +49,8 @@ def minOperations(n):
 
 ## 👉 Initialisation :
 
+
+
 operations : compteur du nombre total d'opérations.
 
 factor : commence à 2 car c’est le plus petit facteur possible.
@@ -53,6 +61,8 @@ factor : commence à 2 car c’est le plus petit facteur possible.
 ```
 
 ## 👉 Tant qu’on n’a pas réduit n à 1 (ce qui signifie qu’on a simulé les multiplications jusqu’à 1), on continue.
+
+
 
 ```python
         while n % factor == 0:
@@ -70,16 +80,21 @@ Réduit n en divisant par ce factor.
 
 💡 Cela revient à factoriser n en entiers premiers.
 
+
+
 ```python
         factor += 1
 ```
 ## 👉 On passe au prochain facteur possible.
+
+
 
 ## ✅ Exemple : minOperations(9)
 Factorisation de 9 = 3 × 3
 → Ajoute 3 (1 Copy + 2 Paste)
 → Puis encore 3
 → Total = 6 opérations
+
 
 ## ✅ Tests du checker (explication)
 ```bash
@@ -95,6 +110,7 @@ Factorisation de 9 = 3 × 3
 | 1             | 0                | Déjà 1 H, aucune opération nécessaire                                                           |
 | 0 ou -12      | 0                | Impossible → retour 0                                                                           |
 | 2147483640    | ✓ correcte       | Un très grand nombre, mais bien factorisé → toujours fonctionnel                                |
+
 
 ```
 ## 🧪 Exemples développés
