@@ -1,19 +1,4 @@
 #!/usr/bin/python3
-# """
-# 0-stats.py - Log Parsing
-
-# This script reads log lines from standard input (stdin),
-# parses valid lines matching the format:
-# <IP Address> - [<date>] "GET /projects/260 HTTP/1.1" <status code> <file size>
-
-# It computes and prints the following metrics:
-# - Total file size (sum of all file sizes)
-# - Number of occurrences for each status code (only specific ones)
-
-# It prints stats:
-# - Every 10 lines read
-# - When interrupted with CTRL + C (KeyboardInterrupt)
-# """
 """Script that parses logs from stdin and computes metrics."""
 
 import sys
