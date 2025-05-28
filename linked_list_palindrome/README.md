@@ -99,7 +99,7 @@ Si une différence est trouvée → pas un palindrome
 ### 6. Restaurer la liste
 ```c
 reverse_list(second_half);
-```c
+```
 On restaure l’ordre original pour ne pas modifier la liste (bonne pratique).
 
 ### 7. Conclusion
