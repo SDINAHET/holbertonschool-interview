@@ -1,13 +1,13 @@
 #include "binary_trees.h"
 
 /**
- * build_avl - Recursive helper to build AVL from sorted array
- * @array: Pointer to array
- * @start: Start index
- * @end: End index
+ * build_avl - Recursively builds a balanced AVL tree from a sorted array
+ * @array: Pointer to the first element of the array
+ * @start: Starting index
+ * @end: Ending index
  * @parent: Pointer to parent node
  *
- * Return: Pointer to created node or NULL
+ * Return: Pointer to the created node, or NULL on failure
  */
 avl_t *build_avl(int *array, int start, int end, avl_t *parent)
 {
@@ -29,11 +29,11 @@ avl_t *build_avl(int *array, int start, int end, avl_t *parent)
 }
 
 /**
- * sorted_array_to_avl - Builds AVL tree from sorted array
+ * sorted_array_to_avl - Builds an AVL tree from a sorted array
  * @array: Pointer to array
  * @size: Number of elements in array
  *
- * Return: Pointer to root of AVL tree, or NULL on failure
+ * Return: Pointer to root node of AVL tree, or NULL on failure
  */
 avl_t *sorted_array_to_avl(int *array, size_t size)
 {
@@ -41,4 +41,3 @@ avl_t *sorted_array_to_avl(int *array, size_t size)
 		return (NULL);
 	return (build_avl(array, 0, (int)size - 1, NULL));
 }
-/**/
