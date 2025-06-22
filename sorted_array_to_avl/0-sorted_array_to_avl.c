@@ -1,13 +1,33 @@
 #include "binary_trees.h"
 
 /**
- * build_avl - Recursively builds a balanced AVL tree from a sorted array
- * @array: Pointer to the first element of the array
- * @start: Starting index
- * @end: Ending index
- * @parent: Pointer to parent node
- *
- * Return: Pointer to the created node, or NULL on failure
+ * binary_tree_node - Creates a binary tree node
+ * @parent: Pointer to the parent node
+ * @value: Value to store in the new node
+ * Return: Pointer to new node or NULL
+ */
+binary_tree_t *binary_tree_node(binary_tree_t *parent, int value)
+{
+	binary_tree_t *new_node = malloc(sizeof(binary_tree_t));
+
+	if (!new_node)
+		return (NULL);
+
+	new_node->n = value;
+	new_node->parent = parent;
+	new_node->left = NULL;
+	new_node->right = NULL;
+
+	return (new_node);
+}
+
+/**
+ * build_avl - Recursively builds AVL from sorted array
+ * @array: Array of ints
+ * @start: Start index
+ * @end: End index
+ * @parent: Parent node
+ * Return: Pointer to root node
  */
 avl_t *build_avl(int *array, int start, int end, avl_t *parent)
 {
@@ -30,10 +50,9 @@ avl_t *build_avl(int *array, int start, int end, avl_t *parent)
 
 /**
  * sorted_array_to_avl - Builds an AVL tree from a sorted array
- * @array: Pointer to array
- * @size: Number of elements in array
- *
- * Return: Pointer to root node of AVL tree, or NULL on failure
+ * @array: Array of ints
+ * @size: Size of array
+ * Return: Root of AVL tree or NULL
  */
 avl_t *sorted_array_to_avl(int *array, size_t size)
 {
