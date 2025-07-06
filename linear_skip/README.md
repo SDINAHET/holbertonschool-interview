@@ -76,4 +76,5 @@ Fichiers header protégés par #ifndef / #define / #endif
 
 https://github.com/hs-hq/0x0E.Linear_search-in_skip_list/tree/main
 
+gcc -Wall -Wextra -Werror -pedantic 0-main.c 0-linear_skip.c skiplist/*.c -lm -o 0-linear_skip
 
