@@ -20,3 +20,28 @@ npm notice
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_
 speFS/algo/holbertonschool-interview/starwars_api#
 ```
+
+
+
+1. Va dans le dossier starwars_api :
+bash
+Copier le code
+cd starwars_api
+2. Initialise un projet local :
+bash
+Copier le code
+npm init -y
+→ Cela crée un fichier package.json.
+
+3. Installe request et semistandard localement :
+bash
+Copier le code
+npm install request
+npm install --save-dev semistandard
+4. Teste si request fonctionne :
+Ton script 0-starwars_characters.js peut maintenant faire :
+
+js
+Copier le code
+const request = require('request');
+et fonctionnera, car node va chercher node_modules/request localement.
