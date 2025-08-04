@@ -45,11 +45,15 @@ int recursive_search(int *array, int left, int right, int value)
 		/* Check if first occurrence */
 		if (mid == left || array[mid - 1] != value)
 			return (mid);
-		return (recursive_search(array, left, mid - 1, value));
+		/* Continue left INCLUDING mid to get correct display */
+		return (recursive_search(array, left, mid, value));
 	}
-	if (array[mid] > value)
-		return (recursive_search(array, left, mid - 1, value));
-	return (recursive_search(array, mid + 1, right, value));
+
+	if (array[mid] < value)
+		return (recursive_search(array, mid + 1, right, value));
+
+	/* array[mid] > value */
+	return (recursive_search(array, left, mid, value)); /* <-- NOT mid - 1 */
 }
 
 /**
