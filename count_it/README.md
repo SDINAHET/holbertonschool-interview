@@ -177,7 +177,7 @@ pep8:
 	$(PY) -m unittest -v
 ```
 
-lancement test avec makfile
+lancement test avec Makefile
 ```bash
 # Depuis le dossier du projet : holbertonschool-interview/count_it
 make            # PEP8 sur 0-count.py puis tous les tests
@@ -204,7 +204,7 @@ python3 0-main.py programming 'JavA java'
 python3 0-main.py not_a_valid_subreddit 'python java'
 ```
 
-Requirments
+Requirements
 ```bash
 python3 -m unittest -v test_requirements_0_count.py
 # ou avec ton Makefile (si les tests globaux incluent ce fichier) :
