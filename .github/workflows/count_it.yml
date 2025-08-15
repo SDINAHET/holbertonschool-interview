@@ -28,7 +28,7 @@ jobs:
       - name: Install dev deps
         run: |
           python -m pip install --upgrade pip
-          pip install pycodestyle
+          pip install pycodestyle requests
 
       - name: PEP8 on 0-count.py
         working-directory: count_it
