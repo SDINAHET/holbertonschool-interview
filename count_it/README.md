@@ -106,6 +106,9 @@ Ensure we follow 'after' and aggregate counts across pages (recursive). ... ok
 Ran 13 tests in 0.248s
 
 OK
+```
+
+```bash
 pycodestyle 0-count.py
 python3 -m unittest -v
 test_invalid_subreddit_list1 (test_integration_0_count.TestCountWordsIntegration)
