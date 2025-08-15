@@ -435,3 +435,12 @@ tableau global
 - **Simulation** : présence de `README.md`.
 - **Validation** : OK.
 
+
+
+CI/CD
+### Petit mémo
+
+- Le workflow se déclenche **uniquement** quand des fichiers sous `count_it/` changent.
+- `pycodestyle` ne lint que **`0-count.py`** (aligné avec le Makefile).
+- Les tests utilisent ton **Makefile** (`make` ⇒ cible `all`) s’il est présent, sinon ils basculent sur **`python -m unittest -v`**.
+
