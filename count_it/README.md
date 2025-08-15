@@ -1,3 +1,4 @@
+```bash
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool
 -interview/count_it# python3 0-main.py programming 'react python java javascript scala no_results_for_this_one'
 python: 18
@@ -16,10 +17,10 @@ root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonscho
 -interview/count_it# python3 0-main.py not_a_valid_subreddit 'python java'
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool
 -interview/count_it#
+```
 
 
-
-
+```bash
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool
 -interview/count_it# make pep8
 make test
@@ -61,6 +62,7 @@ Ran 13 tests in 0.273s
 OK
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool
 -interview/count_it#
+```
 
 
 
@@ -68,7 +70,7 @@ root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonscho
 
 
 
-
+```bash
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool
 -interview/count_it# make        # lance pep8 puis les tests
 make pep8   # seulement PEP8
@@ -138,6 +140,7 @@ OK
 make: Nothing to be done for 'test'.
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool
 -interview/count_it#
+```
 
 | type de test        | Nom du test                          | Ce qui est vérifié                                         | Scénario / Entrées simulées                                                                 | Sortie attendue                                                         |
 |--------------|--------------------------------------|-------------------------------------------------------------|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
