@@ -138,3 +138,62 @@ OK
 make: Nothing to be done for 'test'.
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool
 -interview/count_it#
+
+| type de test        | Nom du test                          | Ce qui est vérifié                                         | Scénario / Entrées simulées                                                                 | Sortie attendue                                                         |
+|--------------|--------------------------------------|-------------------------------------------------------------|----------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| Integration  | `test_valid_subreddit_list1`         | Subreddit valide + pagination + tri (count ↓ puis A→Z)     | 2 pages mockées (`after` présent puis `None`), titres contenant `python`, `javascript`, `react`, `java`, `scala` | Lignes (ordre exact) : `python: 4`, `javascript: 3`, `react: 3`, `java: 2`, `scala: 2` |
+| Integration  | `test_valid_subreddit_case_insensitive` | Casse insensible sur mots-clés et titres                    | Une page avec `Python PYTHON python` et `React` ; keywords `["PYTHON","react"]`             | Lignes : `python: 3`, `react: 1`                                       |
+| Integration  | `test_valid_subreddit_duplicates_in_list` | Doublons dans `word_list` ⇒ multiplicité (somme)            | Titre : `java javascript java`; keywords `["JavA","java"]`                                   | `java: 4` (2 occurrences × multiplicité 2)                              |
+| Integration  | `test_invalid_subreddit_list1`       | Subreddit invalide ⇒ n’imprime rien                         | Réponse mock **404**                                                                         | Aucune sortie                                                           |
+| Unit         | `test_exact_tokens_punct_ignored`    | Comptage par token exact ; ponctuation ignorée pour `java.`, `java!`, `java_` | Titres avec `java java. java! java_ javascript`, etc.                                        | Lignes (ordre exact) : `python: 3`, `react: 3`, `scala: 2`, `java: 1`, `javascript: 1` |
+| Unit         | `test_case_insensitive_and_duplicates` | Doublons + casse insensible                                  | Titre : `java javascript java`; keywords `["JavA","java"]`                                   | `java: 4`                                                               |
+| Unit         | `test_recursion_across_pages`        | Récursivité via `after` (agrégation multi-pages)            | 2 pages mockées ; mélange de titres                                                          | Lignes (ordre exact) : `python: 4`, `javascript: 3`, `react: 3`, `java: 2`, `scala: 2` |
+| Unit         | `test_invalid_subreddit_status_302`  | Status non-200 (ex. 302/redirect) ⇒ rien                    | Réponse mock **302**                                                                          | Aucune sortie                                                           |
+| Unit         | `test_no_matches_prints_nothing`     | Aucun mot-clé présent ⇒ rien                                | Titre : `golang rust typescript` ; keywords `["python","java"]`                               | Aucune sortie                                                           |
+| Meta         | `test_file_exists`                   | Le fichier demandé existe                                   | `0-count.py`                                                                                 | OK                                                                      |
+| Meta         | `test_first_line_shebang`            | Première ligne = `#!/usr/bin/python3`                       | Lecture de la 1ʳᵉ ligne                                                                      | OK                                                                      |
+| Meta         | `test_imports_alpha_order`           | Ordre alphabétique des imports                              | Parcours des lignes `import`/`from`                                                          | OK                                                                      |
+| Meta         | `test_readme_exists`                 | Présence du `README.md`                                     | Fichier dans `count_it/`                                                                     | OK                                                                      |
+
+
+
+fichier makefile
+```bash
+.PHONY: test pep8 all
+PY = python3
+# Utilise pycodestyle si dispo, sinon pep8
+PEP8 ?= $(shell command -v pycodestyle >/dev/null 2>&1 && echo pycodestyle || echo pep8)
+
+all: pep8 test
+
+pep8:
+	$(PEP8) 0-count.py
+	$(PY) -m unittest -v
+```
+
+lancement test avec makfile
+```bash
+# Depuis le dossier du projet : holbertonschool-interview/count_it
+make            # PEP8 sur 0-count.py puis tous les tests
+make pep8       # seulement PEP8
+make test       # seulement les tests
+```
+
+```bash
+make -C count_it
+make -C count_it pep8
+make -C count_it test
+```
+
+Lancer manuellement sans Makefile :
+```bash
+pycodestyle 0-count.py
+python3 -m unittest -v
+```
+
+Exécuter le script d’exemple fourni par Holberton :
+```bash
+python3 0-main.py programming 'react python java javascript scala no_results_for_this_one'
+python3 0-main.py programming 'JavA java'
+python3 0-main.py not_a_valid_subreddit 'python java'
+```
