@@ -203,3 +203,106 @@ python3 0-main.py programming 'react python java javascript scala no_results_for
 python3 0-main.py programming 'JavA java'
 python3 0-main.py not_a_valid_subreddit 'python java'
 ```
+
+Requirments
+```bash
+python3 -m unittest -v test_requirements_0_count.py
+# ou avec ton Makefile (si les tests globaux incluent ce fichier) :
+make test
+```
+
+```bash
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool
+-interview/count_it# python3 -m unittest -v test_requirements_0_count.py
+# ou avec ton Makefile (si les tests globaux incluent ce fichier) :
+make test
+test_desc_sort_then_alpha_ties_and_skip_zero (test_requirements_0_count.TestRequirements)
+Sorted by count desc, then alpha; words with zero -> skipped; ... <frozen importlib._bootstrap>:283: DeprecationWarning: the load_module() method is deprecated and slated for removal in Python 3.12; use exec_module() instead
+ok
+test_duplicates_sum_multiplicity (test_requirements_0_count.TestRequirements)
+Duplicates in word_list sum (multiplicity). ... <frozen importlib._bootstrap>:283: DeprecationWarning: the load_module() method is deprecated and slated for removal in Python 3.12; use exec_module() instead
+ok
+test_invalid_subreddit_prints_nothing (test_requirements_0_count.TestRequirements)
+Invalid subreddit -> non-200 -> print nothing. ... ok
+test_no_redirects_flag_is_false (test_requirements_0_count.TestRequirements)
+Ensure allow_redirects=False is passed to requests.get. ... ok
+test_occurrence_based_not_titles (test_requirements_0_count.TestRequirements)
+Counts occurrences, not titles: 'java java java' -> 3. ... ok
+test_prototype_callable_two_args (test_requirements_0_count.TestRequirements)
+Prototype callable: def count_words(subreddit, word_list). ... ok
+test_punctuation_not_counted (test_requirements_0_count.TestRequirements)
+java., java!, java_ do NOT count as 'java'. ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.203s
+
+OK
+make: Nothing to be done for 'test'.
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool
+-interview/count_it#
+```
+
+Tableau
+
+| Suite           | Nom du test                                      | Ce qui est vérifié                                                                 | Statut |
+|-----------------|---------------------------------------------------|-------------------------------------------------------------------------------------|:------:|
+| Requirements    | `test_desc_sort_then_alpha_ties_and_skip_zero`   | Tri par **count↓ puis A→Z**, **skip** des mots à 0, sortie en **minuscule**        |  ✅    |
+| Requirements    | `test_duplicates_sum_multiplicity`               | **Doublons** dans `word_list` ⇒ multiplicité (somme)                               |  ✅    |
+| Requirements    | `test_invalid_subreddit_prints_nothing`          | Subreddit **invalide** (non-200) ⇒ **n’imprime rien**                              |  ✅    |
+| Requirements    | `test_no_redirects_flag_is_false`                | Appel `requests.get` avec `allow_redirects=False` (**pas de redirection suivie**)  |  ✅    |
+| Requirements    | `test_occurrence_based_not_titles`               | Comptage basé sur les **occurrences**, pas le nombre de titres                     |  ✅    |
+| Requirements    | `test_prototype_callable_two_args`               | Prototype appelable : `count_words(subreddit, word_list)`                          |  ✅    |
+| Requirements    | `test_punctuation_not_counted`                   | `java.`, `java!`, `java_` **ne comptent pas** comme `java`                         |  ✅    |
+
+ integration makfile
+```old
+ .PHONY: test pep8 all
+PY = python3
+# Utilise pycodestyle si dispo, sinon pep8
+PEP8 ?= $(shell command -v pycodestyle >/dev/null 2>&1 && echo pycodestyle || echo pep8)
+
+all: pep8 test
+
+pep8:
+	$(PEP8) 0-count.py
+	$(PY) -m unittest -v
+```
+
+new
+```bash
+.PHONY: all pep8 test test-unit test-integration test-requirements test-meta help
+PY   = python3
+# Utilise pycodestyle si dispo, sinon pep8
+PEP8 ?= $(shell command -v pycodestyle >/dev/null 2>&1 && echo pycodestyle || echo pep8)
+
+all: pep8 test
+
+## ---- Qualité ----
+pep8:
+	$(PEP8) 0-count.py
+
+## ---- Tests ----
+test:
+	$(PY) -m unittest -v
+
+test-unit:
+	$(PY) -m unittest -v test_unit_0_count.py
+
+test-integration:
+	$(PY) -m unittest -v test_integration_0_count.py
+
+test-requirements:
+	$(PY) -m unittest -v test_requirements_0_count.py
+
+test-meta:
+	$(PY) -m unittest -v test_meta_0_count.py
+
+help:
+	@echo "make            -> pep8 + tous les tests"
+	@echo "make pep8       -> PEP8 sur 0-count.py"
+	@echo "make test       -> tous les tests (découverte unittest)"
+	@echo "make test-unit  -> tests unitaires"
+	@echo "make test-integration -> tests d'intégration"
+	@echo "make test-requirements -> tests des exigences"
+	@echo "make test-meta  -> tests méta (shebang, README, imports)"
+```
