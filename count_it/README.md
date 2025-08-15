@@ -437,7 +437,7 @@ tableau global
 
 
 
-CI/CD
+CI/CD github-actions count_it.yml
 ### Petit mémo
 
 - Le workflow se déclenche **uniquement** quand des fichiers sous `count_it/` changent.
