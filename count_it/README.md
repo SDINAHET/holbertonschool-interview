@@ -307,3 +307,129 @@ help:
 	@echo "make test-requirements -> tests des exigences"
 	@echo "make test-meta  -> tests méta (shebang, README, imports)"
 ```
+
+tableau global
+| Suite          | Test                                          | Vérifie                                                                 | Entrées simulées                                                                                  | Attendu                                                                                           |
+|----------------|-----------------------------------------------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| Integration    | test_valid_subreddit_list1                    | Subreddit valide + **pagination** + **tri**                              | 2 pages (after → puis None) avec titres: python, javascript, react, java, scala                  | `python: 4`, `javascript: 3`, `react: 3`, `java: 2`, `scala: 2` (ordre exact)                    |
+| Integration    | test_valid_subreddit_case_insensitive         | **Casse insensible** (mots-clés + titres)                                | 1 page: “Python PYTHON python”, “React”; keywords `["PYTHON","react"]`                           | `python: 3`, `react: 1`                                                                           |
+| Integration    | test_valid_subreddit_duplicates_in_list       | **Doublons** dans `word_list` ⇒ multiplicité                             | 1 titre: “java javascript java”; keywords `["JavA","java"]`                                      | `java: 4` (2 occurrences × multiplicité 2)                                                       |
+| Integration    | test_invalid_subreddit_list1                  | Subreddit **invalide** ⇒ **rien n’est imprimé**                          | Statut HTTP 404                                                                                  | Sortie vide                                                                                       |
+| Unit           | test_exact_tokens_punct_ignored               | **Token exact** ; ponctuation **non comptée**                            | Titres: “java java. java! java_ javascript”, …                                                   | `python: 3`, `react: 3`, `scala: 2`, `java: 1`, `javascript: 1`                                   |
+| Unit           | test_case_insensitive_and_duplicates          | **Casse** + **doublons**                                                 | “java javascript java”; keywords `["JavA","java"]`                                               | `java: 4`                                                                                        |
+| Unit           | test_recursion_across_pages                   | **Récursivité** via `after` (agrégation multi-pages)                     | 2 pages chaînées (after = "t3_next" puis None)                                                   | `python: 4`, `javascript: 3`, `react: 3`, `java: 2`, `scala: 2`                                   |
+| Unit           | test_invalid_subreddit_status_302             | **Redirect**/non-200 ⇒ **rien**                                          | Statut 302                                                                                       | Sortie vide                                                                                       |
+| Unit           | test_no_matches_prints_nothing                | **Aucun match** ⇒ **rien**                                               | Titre: “golang rust typescript”; keywords `["python","java"]`                                    | Sortie vide                                                                                       |
+| Requirements   | test_desc_sort_then_alpha_ties_and_skip_zero  | **Tri count↓ puis alpha** ; **skip 0** ; **minuscule**                    | “alpha alpha”, “beta beta”; keywords `["beta","alpha","GAMMA"]`                                  | `alpha: 2`, `beta: 2` (gamma ignoré)                                                             |
+| Requirements   | test_duplicates_sum_multiplicity              | Somme des **doublons**                                                   | “java javascript java”; keywords `["JavA","java"]`                                               | `java: 4`                                                                                        |
+| Requirements   | test_invalid_subreddit_prints_nothing         | Subreddit **invalide** ⇒ **rien**                                        | Statut 404                                                                                       | Sortie vide                                                                                       |
+| Requirements   | test_no_redirects_flag_is_false               | `allow_redirects=False` passé à `requests.get`                           | Appel inspecté via mock                                                                           | Paramètre présent et à `False`                                                                    |
+| Requirements   | test_occurrence_based_not_titles              | **Occurrences**, pas le nombre de titres                                 | “java java java”                                                                                 | `java: 3`                                                                                        |
+| Requirements   | test_prototype_callable_two_args              | Prototype **appelable** avec 2 args                                      | Appel `count_words("programming", ["java"])`                                                     | Pas d’exception (exécution OK)                                                                    |
+| Requirements   | test_punctuation_not_counted                  | `java.`, `java!`, `java_` **non comptés**                                | Titres: “java. java! java_ java,” + “java”                                                       | `java: 1`                                                                                        |
+| Meta           | test_file_exists                              | Fichier **présent**                                                      | Présence de `0-count.py`                                                                          | OK                                                                                                |
+| Meta           | test_first_line_shebang                       | 1ʳᵉ ligne = `#!/usr/bin/python3`                                         | Lecture de la 1ʳᵉ ligne                                                                           | OK                                                                                                |
+| Meta           | test_imports_alpha_order                      | **Ordre alphabétique** des imports                                       | Parcours des lignes `import`/`from`                                                               | OK                                                                                                |
+| Meta           | test_readme_exists                            | Présence du **README.md**                                                | Fichier `README.md` dans `count_it/`                                                              | OK                                                                                                |
+
+## Explications (3 lignes par test)
+
+Integration / test_valid_subreddit_list1
+• Contexte : agrégation de plusieurs pages /hot avec pagination.
+• Simulation : 2 pages mockées avec after puis fin.
+• Validation : total par mot, tri count↓ puis A→Z, ordre exact attendu.
+
+Integration / test_valid_subreddit_case_insensitive
+• Contexte : casse indifférente pour mots-clés et titres.
+• Simulation : titres mixtes “Python/PYTHON/python”, “React”.
+• Validation : python: 3, react: 1.
+
+Integration / test_valid_subreddit_duplicates_in_list
+• Contexte : mots dupliqués dans word_list s’additionnent.
+• Simulation : keywords ["JavA","java"] + deux “java” dans le titre.
+• Validation : java: 4 (2 × multiplicité 2).
+
+Integration / test_invalid_subreddit_list1
+• Contexte : subreddit invalide.
+• Simulation : réponse HTTP 404.
+• Validation : aucune sortie (comportement silencieux).
+
+Unit / test_exact_tokens_punct_ignored
+• Contexte : compter uniquement les tokens nus.
+• Simulation : “java.”/“java!”/“java_” présents mais ignorés.
+• Validation : seul java nu est compté ; ordre final attendu.
+
+Unit / test_case_insensitive_and_duplicates
+• Contexte : casse + doublons.
+• Simulation : 2 occurrences de java et multiplicité 2.
+• Validation : java: 4.
+
+Unit / test_recursion_across_pages
+• Contexte : appel récursif via after.
+• Simulation : 2 pages chaînées.
+• Validation : sommes cumulées et tri correct.
+
+Unit / test_invalid_subreddit_status_302
+• Contexte : redirection/non-200.
+• Simulation : statut 302 (redirect).
+• Validation : sortie vide (on ne suit pas la redirection).
+
+Unit / test_no_matches_prints_nothing
+• Contexte : aucun mot-clé trouvé.
+• Simulation : titres sans les mots suivis.
+• Validation : aucune ligne imprimée.
+
+Requirements / test_desc_sort_then_alpha_ties_and_skip_zero
+• Contexte : tri count↓ puis A→Z + skip des zéros + minuscules.
+• Simulation : alpha=2, beta=2, gamma=0.
+• Validation : alpha: 2, beta: 2; gamma absent.
+
+Requirements / test_duplicates_sum_multiplicity
+• Contexte : règle des doublons (addition).
+• Simulation : ["JavA","java"] + 2 “java”.
+• Validation : java: 4.
+
+Requirements / test_invalid_subreddit_prints_nothing
+• Contexte : subreddit invalide.
+• Simulation : statut 404.
+• Validation : sortie vide.
+
+Requirements / test_no_redirects_flag_is_false
+• Contexte : ne pas suivre les redirections.
+• Simulation : inspection des kwargs du mock requests.get.
+• Validation : allow_redirects=False.
+
+Requirements / test_occurrence_based_not_titles
+• Contexte : compter les occurrences, pas les titres.
+• Simulation : “java java java”.
+• Validation : java: 3.
+
+Requirements / test_prototype_callable_two_args
+• Contexte : prototype compatible avec 2 arguments.
+• Simulation : appel count_words("programming", ["java"]).
+• Validation : aucune exception levée.
+
+Requirements / test_punctuation_not_counted
+• Contexte : ponctuation non comptée.
+• Simulation : “java. java! java_ java,” + “java”.
+• Validation : java: 1.
+
+Meta / test_file_exists
+• Contexte : structure du projet.
+• Simulation : présence de 0-count.py.
+• Validation : OK.
+
+Meta / test_first_line_shebang
+• Contexte : exécutable Python.
+• Simulation : lecture de la 1ʳᵉ ligne.
+• Validation : #!/usr/bin/python3.
+
+Meta / test_imports_alpha_order
+• Contexte : style des imports.
+• Simulation : comparaison triée des lignes import.
+• Validation : ordre alphabétique.
+
+Meta / test_readme_exists
+• Contexte : documentation minimale requise.
+• Simulation : présence de README.md.
+• Validation : OK.
