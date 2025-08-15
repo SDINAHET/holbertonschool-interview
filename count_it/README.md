@@ -255,8 +255,9 @@ Tableau
 | Requirements    | `test_punctuation_not_counted`                   | `java.`, `java!`, `java_` **ne comptent pas** comme `java`                         |  ✅    |
 
  integration makfile
-```old
- .PHONY: test pep8 all
+old
+```bash
+.PHONY: test pep8 all
 PY = python3
 # Utilise pycodestyle si dispo, sinon pep8
 PEP8 ?= $(shell command -v pycodestyle >/dev/null 2>&1 && echo pycodestyle || echo pep8)
