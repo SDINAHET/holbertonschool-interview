@@ -1,0 +1,17 @@
+CC      := gcc
+CFLAGS  := -Wall -Wextra -Werror -pedantic
+TARGET  := 0-heap_extract
+SRC     := 0-main.c 0-heap_extract.c binary_tree_print.c
+LIBS    := -L. -lheap
+
+all: $(TARGET)
+
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) -o $@ $(SRC) $(LIBS)
+
+clean:
+	$(RM) $(TARGET)
+
+re: clean all
+
+.PHONY: all clean re
