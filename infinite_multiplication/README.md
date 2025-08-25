@@ -126,3 +126,4 @@ root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonscho
 Summary: 10 pass / 0 fail
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/infinite_multiplication#
 ```
+
