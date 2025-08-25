@@ -8,8 +8,8 @@ fail=0
 
 nl=$'\n'
 
-ok() { printf "✅ %s\n" "$1"; ((pass++)); }
-ko() { printf "❌ %s\n" "$1"; ((fail++)); }
+ok() { printf "✅ %s\n" "$1"; pass=$((pass+1)); }
+ko() { printf "❌ %s\n" "$1"; fail=$((fail+1)); }
 
 run_ok () {
   local a="$1" b="$2" expected="$3"
@@ -65,4 +65,4 @@ run_err 98                "1" "2" "3"
 
 echo "${nl}=== Résumé ==="
 echo "Pass: $pass / Fail: $fail"
-[[ $fail -eq 0 ]]
+test "$fail" -eq 0
