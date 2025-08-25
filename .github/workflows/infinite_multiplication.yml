@@ -1,0 +1,108 @@
+name: Infinite Multiplication CI
+
+on:
+  push:
+    paths:
+      - 'infinite_multiplication/**'
+  pull_request:
+    paths:
+      - 'infinite_multiplication/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: infinite_multiplication
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install build tools + ltrace + Betty
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential ltrace git
+          # Install Betty linters
+          git clone https://github.com/holbertonschool/Betty.git /tmp/Betty
+          sudo cp /tmp/Betty/betty-style.pl /tmp/Betty/betty-doc.pl /usr/local/bin/
+          sudo chmod +x /usr/local/bin/betty-*.pl
+
+      - name: Ensure mandatory files exist
+        run: |
+          test -s 0-mul.c
+          test -s _putchar.c
+          test -s mul.h
+          test -s README.md || echo "README.md missing" && true
+
+      - name: Compile program (Makefile if present)
+        run: |
+          if [ -f Makefile ]; then
+            make re
+          else
+            gcc -Wall -Wextra -Werror -pedantic -std=gnu89 0-mul.c _putchar.c -o mul
+          fi
+
+      - name: Unit tests (C harness or Bash)
+        run: |
+          set -e
+          if [ -f test0b-mul.c ]; then
+            gcc -Wall -Wextra -Werror -pedantic -std=gnu89 test0b-mul.c -o test_mul
+            ./test_mul
+          elif [ -f test0-mul.c ]; then
+            gcc -Wall -Wextra -Werror -pedantic -std=gnu89 test0-mul.c -o test_mul
+            ./test_mul
+          elif [ -f tests.sh ]; then
+            chmod +x ./tests.sh
+            ./tests.sh ./mul
+          else
+            echo "No tests found"; exit 1
+          fi
+
+      # --- Steps below reproduces the scoreboard-style checks ---
+      - name: Correct output - case: Two very big numbers
+        run: |
+          out="$(./mul 123456789 987654321)"
+          test "$out" = "121932631112635269"
+
+      - name: Correct output - case: Multiply by 0000000000000
+        run: |
+          out="$(./mul 000000 42)"
+          test "$out" = "0"
+
+      - name: Correct output - case: Error handling
+        run: |
+          set +e
+          ./mul 123 12x >/tmp/out 2>/dev/null; rc=$?
+          set -e
+          grep -qx "Error" /tmp/out
+          test $rc -eq 98
+
+      - name: Return SUCCESS
+        run: |
+          ./mul 10 98 | grep -qx "980"
+
+      - name: ltrace allowed functions (informational)
+        run: |
+          sudo ltrace -f -o ltrace.txt ./mul 123 456 >/dev/null || true
+          echo "First lines of ltrace:"
+          head -n 40 ltrace.txt || true
+          # Basic guard against obviously bad calls
+          ! grep -E "(system|popen|execv|fork)" ltrace.txt || (echo "Disallowed call found" && exit 1)
+
+      - name: Betty coding style
+        run: |
+          betty-style.pl 0-mul.c mul.h || true
+          betty-doc.pl   0-mul.c       || true
+
+      - name: Upload artifacts (binary, tests, traces)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: infinite_multiplication-artifacts
+          path: |
+            infinite_multiplication/mul
+            infinite_multiplication/test_mul
+            infinite_multiplication/ltrace.txt
+          if-no-files-found: ignore
