@@ -2,15 +2,15 @@ name: Infinite Multiplication CI
 
 on:
   push:
-    branches: ["**"]                    # or ["main"] if you prefer
+    branches: ["**"]                           # ou ["main"]
     paths:
-      - "infinite_multiplication/**"    # code changes
-      - ".github/workflows/infinite_multiplication.yml"  # workflow edits
+      - "infinite_multiplication/**"           # code du projet
+      - ".github/workflows/infinite_multiplication.yml"  # modif du workflow
   pull_request:
     branches: ["**"]
     paths:
       - "infinite_multiplication/**"
-  workflow_dispatch: {}                  # manual "Run workflow" button
+  workflow_dispatch: {}
 
 jobs:
   build-and-test:
@@ -18,6 +18,7 @@ jobs:
     defaults:
       run:
         working-directory: infinite_multiplication
+        shell: bash
 
     steps:
       - name: Checkout repository
@@ -28,8 +29,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential ltrace git
           git clone https://github.com/holbertonschool/Betty.git /tmp/Betty
-          sudo cp /tmp/Betty/betty-style.pl /tmp/Betty/betty-doc.pl /usr/local/bin/
-          sudo chmod +x /usr/local/bin/betty-*.pl
+          sudo install -m 0755 /tmp/Betty/betty-style.pl /usr/local/bin/betty-style.pl
+          sudo install -m 0755 /tmp/Betty/betty-doc.pl   /usr/local/bin/betty-doc.pl
 
       - name: Ensure mandatory files exist
         run: |
@@ -46,57 +47,67 @@ jobs:
             gcc -Wall -Wextra -Werror -pedantic -std=gnu89 0-mul.c _putchar.c -o mul
           fi
 
-      - name: Unit tests (C harness or Bash)
+      - name: Run tests (run BOTH if present)
         run: |
-          set -e
+          set -euo pipefail
+          ran=0
+
+          # C harness
           if [ -f test0b-mul.c ]; then
-            gcc -Wall -Wextra -Werror -pedantic -std=gnu89 test0b-mul.c -o test_mul
-            ./test_mul
-          elif [ -f test0-mul.c ]; then
-            gcc -Wall -Wextra -Werror -pedantic -std=gnu89 test0-mul.c -o test_mul
-            ./test_mul
-          elif [ -f tests.sh ]; then
-            chmod +x ./tests.sh
+            gcc -Wall -Wextra -Werror -pedantic -std=gnu89 test0b-mul.c -o test_mul_c
+            ./test_mul_c
+            ran=1
+          fi
+
+          # Bash or C in test0-mul.c
+          if [ -f test0-mul.c ]; then
+            if head -n1 test0-mul.c | grep -q '#!/usr/bin/env bash'; then
+              chmod +x test0-mul.c
+              ./test0-mul.c ./mul
+            else
+              gcc -Wall -Wextra -Werror -pedantic -std=gnu89 test0-mul.c -o test_mul
+              ./test_mul
+            fi
+            ran=1
+          fi
+
+          # Optional tests.sh
+          if [ -f tests.sh ]; then
+            chmod +x tests.sh
             ./tests.sh ./mul
-          else
+            ran=1
+          fi
+
+          if [ "$ran" -eq 0 ]; then
             echo "No tests found"; exit 1
           fi
 
-      # scoreboard-like checks
-      - name: Correct output - case: Two very big numbers
+      - name: Scoreboard checks
         run: |
-          out="$(./mul 123456789 987654321)"
-          test "$out" = "121932631112635269"
-
-      - name: Correct output - case: Multiply by 0000000000000
-        run: |
-          out="$(./mul 000000 42)"
-          test "$out" = "0"
-
-      - name: Correct output - case: Error handling
-        run: |
+          set -euo pipefail
+          [[ "$(./mul 123456789 987654321)" == "121932631112635269" ]]
+          [[ "$(./mul 000000 42)" == "0" ]]
           set +e
           ./mul 123 12x >/tmp/out 2>/dev/null; rc=$?
           set -e
           grep -qx "Error" /tmp/out
-          test $rc -eq 98
-
-      - name: Return SUCCESS
-        run: |
+          [ $rc -eq 98 ]
           ./mul 10 98 | grep -qx "980"
 
-      - name: ltrace allowed functions (informational)
+      - name: ltrace sanity (informational)
         run: |
           sudo ltrace -f -o ltrace.txt ./mul 123 456 >/dev/null || true
           head -n 40 ltrace.txt || true
-          ! grep -E "(system|popen|execv|fork)" ltrace.txt || (echo "Disallowed call found" && exit 1)
+          if grep -E "(system|popen|execv|fork)" ltrace.txt; then
+            echo "Disallowed call found"; exit 1
+          fi
 
       - name: Betty coding style
         run: |
           betty-style.pl 0-mul.c mul.h || true
           betty-doc.pl   0-mul.c       || true
 
-      - name: Upload artifacts (binary, tests, traces)
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -104,5 +115,6 @@ jobs:
           path: |
             infinite_multiplication/mul
             infinite_multiplication/test_mul
+            infinite_multiplication/test_mul_c
             infinite_multiplication/ltrace.txt
           if-no-files-found: ignore
