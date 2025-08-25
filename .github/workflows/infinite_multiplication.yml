@@ -2,16 +2,19 @@ name: Infinite Multiplication CI
 
 on:
   push:
+    branches: ["**"]                    # or ["main"] if you prefer
     paths:
-      - 'infinite_multiplication/**'
+      - "infinite_multiplication/**"    # code changes
+      - ".github/workflows/infinite_multiplication.yml"  # workflow edits
   pull_request:
+    branches: ["**"]
     paths:
-      - 'infinite_multiplication/**'
+      - "infinite_multiplication/**"
+  workflow_dispatch: {}                  # manual "Run workflow" button
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: infinite_multiplication
@@ -24,7 +27,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential ltrace git
-          # Install Betty linters
           git clone https://github.com/holbertonschool/Betty.git /tmp/Betty
           sudo cp /tmp/Betty/betty-style.pl /tmp/Betty/betty-doc.pl /usr/local/bin/
           sudo chmod +x /usr/local/bin/betty-*.pl
@@ -34,7 +36,7 @@ jobs:
           test -s 0-mul.c
           test -s _putchar.c
           test -s mul.h
-          test -s README.md || echo "README.md missing" && true
+          test -s README.md || { echo "README.md missing"; true; }
 
       - name: Compile program (Makefile if present)
         run: |
@@ -60,7 +62,7 @@ jobs:
             echo "No tests found"; exit 1
           fi
 
-      # --- Steps below reproduces the scoreboard-style checks ---
+      # scoreboard-like checks
       - name: Correct output - case: Two very big numbers
         run: |
           out="$(./mul 123456789 987654321)"
@@ -86,9 +88,7 @@ jobs:
       - name: ltrace allowed functions (informational)
         run: |
           sudo ltrace -f -o ltrace.txt ./mul 123 456 >/dev/null || true
-          echo "First lines of ltrace:"
           head -n 40 ltrace.txt || true
-          # Basic guard against obviously bad calls
           ! grep -E "(system|popen|execv|fork)" ltrace.txt || (echo "Disallowed call found" && exit 1)
 
       - name: Betty coding style
