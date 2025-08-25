@@ -99,3 +99,30 @@ GitHub repository: holbertonschool-interview
 Directory: infinite_multiplication
 
 File: 0-mul.c
+
+
+```bash
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/infinite_multiplication# ./test0-mul.c
+=== Tests OK ===
+✅ OK 123 * 456 == 56088
+```
+
+
+```bash
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/infinite_multiplication# gcc -Wall -Wextra -Werror -pedantic test0b-mul.c -o tes
+t_mul
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/infinite_multiplication# ./test_mul
+✅ 123 * 456
+✅ 0 * 0
+✅ 000000 * 42
+✅ 98 * 765
+✅ big * big
+✅ alpha arg
+✅ bad digit
+✅ no args
+✅ one arg
+✅ three args
+
+Summary: 10 pass / 0 fail
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/infinite_multiplication#
+```
