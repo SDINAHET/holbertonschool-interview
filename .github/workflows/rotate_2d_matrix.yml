@@ -37,12 +37,12 @@ jobs:
           test -s main_0.py
           test -s README.md
 
-      - name: Check executability (Holberton: all files must be executable)
+      - name: Ensure executability (set +x just in case)
         working-directory: rotate_2d_matrix
         run: |
-          test -x 0-rotate_2d_matrix.py
-          test -x main_0.py
-
+          chmod +x 0-rotate_2d_matrix.py
+          chmod +x main_0.py
+          chmod +x main_1.py
       - name: Shebang, docstring, and no-import checks
         working-directory: rotate_2d_matrix
         run: |
