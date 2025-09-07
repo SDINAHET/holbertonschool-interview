@@ -1,100 +1,158 @@
-#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "lists.h"
 
+
 /**
- * add_nodeint - adds a new node at the beginning of a listint_t list
- * @head: pointer to the first node
- * @n: integer value to store
+ * struct listdone_s - singly linked list
+ * @node: node
+ * @next: points to the next node
  *
- * Return: address of the new element, or NULL on failure
+ * Description: singly linked list node done structure
+ * for Holberton project
+ */
+typedef struct listdone_s
+{
+	const struct listint_s *node;
+	struct listdone_s *next;
+} listdone_t;
+
+
+/**
+ * _find_in_list - Search for a node in a list
+ *
+ * @done: The list of known nodes
+ * @node: The address of the node being searched
+ *
+ * Return: The address of the node if it was found. NULL otherwise
+ */
+const listint_t *_find_in_list(listdone_t **done, const listint_t *node)
+{
+	listdone_t *p;
+
+	p = *done;
+	while (p)
+	{
+		if (p->node == node)
+		{
+			return (p->node);
+		}
+		p = p->next;
+	}
+	p = malloc(sizeof(listdone_t));
+	if (p == NULL)
+	{
+		printf("Error\n");
+		exit(98);
+	}
+	p->node = node;
+	p->next = *done;
+	*done = p;
+	return (NULL);
+}
+
+/**
+ * _free_done - Free a list
+ *
+ * @done: A pointer to the first element of a list
+ */
+void _free_done(listdone_t *done)
+{
+	listdone_t *tmp;
+
+	while (done)
+	{
+		tmp = done->next;
+		free(done);
+		done = tmp;
+	}
+}
+
+/**
+ * add_nodeint - Add a node at the beginning of a list
+ *
+ * @head: The address of the pointer to the first element of the list
+ * @n: The number to store in the new element
+ *
+ * Return: A pointer to the new element
  */
 listint_t *add_nodeint(listint_t **head, const int n)
 {
-    listint_t *new;
+	listint_t *new;
 
-    new = malloc(sizeof(listint_t));
-    if (!new)
-        return (NULL);
-    new->n = n;
-    new->next = *head;
-    *head = new;
-    return (new);
+	new = malloc(sizeof(listint_t));
+	if (new == NULL)
+	{
+		return (NULL);
+	}
+	new->n = n;
+	new->next = *head;
+	*head = new;
+	return (new);
 }
 
 /**
- * print_listint_safe - prints a listint_t linked list (handles loops)
- * @head: pointer to the first node
+ * free_listint_safe - Free a list that can contain a loop
  *
- * Return: number of nodes printed
- */
-size_t print_listint_safe(const listint_t *head)
-{
-    const listint_t *slow = head, *fast = head;
-    size_t count = 0, loop_found = 0;
-
-    while (fast && fast->next)
-    {
-        slow = slow->next;
-        fast = fast->next->next;
-        if (slow == fast)
-        {
-            loop_found = 1;
-            break;
-        }
-    }
-
-    while (head)
-    {
-        printf("[%p] %d\n", (void *)head, head->n);
-        count++;
-        if (loop_found && head == slow)
-        {
-            printf("-> [%p] %d\n", (void *)head, head->n);
-            break;
-        }
-        head = head->next;
-    }
-    return (count);
-}
-
-/**
- * free_listint_safe - frees a listint_t list even if it has a loop
- * @h: pointer to the first node
+ * @h: A pointer to the first element of a list
  *
- * Return: number of nodes freed
+ * Return: The number of element in the freed list
  */
 size_t free_listint_safe(listint_t **h)
 {
-    listint_t *tmp;
-    size_t count = 0;
-    listint_t *slow = *h, *fast = *h;
-    int loop_found = 0;
+	listdone_t *done;
+	listint_t *head;
+	listint_t *tmp;
+	size_t n;
 
-    if (!h || !*h)
-        return (0);
+	head = *h;
+	n = 0;
+	done = NULL;
+	while (head)
+	{
+		if (_find_in_list(&done, head) != NULL)
+		{
+			_free_done(done);
+			*h = NULL;
+			return (n);
+		}
+		tmp = head;
+		head = head->next;
+		free(tmp);
+		n++;
+	}
+	_free_done(done);
+	*h = NULL;
+	return (n);
+}
 
-    while (fast && fast->next)
-    {
-        slow = slow->next;
-        fast = fast->next->next;
-        if (slow == fast)
-        {
-            loop_found = 1;
-            break;
-        }
-    }
+/**
+ * print_listint_safe - Prints a list thaht can contains a loop
+ *
+ * @head: A pointer to the first element of a list
+ *
+ * Return: The number of element printed
+ */
+size_t print_listint_safe(const listint_t *head)
+{
+	listdone_t *done;
+	size_t n;
 
-    while (*h)
-    {
-        tmp = *h;
-        *h = (*h)->next;
-        free(tmp);
-        count++;
-        if (loop_found && tmp == slow)
-            break;
-    }
-
-    *h = NULL;
-    return (count);
+	n = 0;
+	done = NULL;
+	while (head)
+	{
+		if (_find_in_list(&done, head) != NULL)
+		{
+			printf("-> [%p] %d\n", (void *)head, head->n);
+			_free_done(done);
+			return (n);
+		}
+		printf("[%p] %d\n", (void *)head, head->n);
+		head = head->next;
+		n++;
+	}
+	_free_done(done);
+	return (n);
 }
