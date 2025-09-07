@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.12']  # runners disponibles - proche des versions récentes
+        python-version: ['3.10', '3.12']
 
     steps:
       - name: Checkout repo
@@ -48,16 +48,19 @@ jobs:
         run: |
           # Shebang exact
           head -n 1 0-rotate_2d_matrix.py | grep -qx '#!/usr/bin/python3'
-          # Module docstring présent (au moins un bloc """ ... """)
+          # Module docstring present
           grep -q '"""' 0-rotate_2d_matrix.py
-          # AUCUNE importation
-          ! grep -Eq '^\s*(import|from)\s+' 0-rotate_2d_matrix.py
+          # No imports allowed (use if-guard instead of leading !)
+          if grep -Eq '^\s*(import|from)\s+' 0-rotate_2d_matrix.py; then
+            echo "Imports detected in 0-rotate_2d_matrix.py" >&2
+            exit 1
+          fi
 
       - name: PEP8 (Holberton uses pep8 1.7.x)
         working-directory: rotate_2d_matrix
         run: |
           pep8 0-rotate_2d_matrix.py
-          # Optionnel: pycodestyle aussi
+          # Optional: pycodestyle as well
           pycodestyle 0-rotate_2d_matrix.py
 
       - name: Built-in sanity tests (like checker matrices)
@@ -69,7 +72,7 @@ jobs:
 
           def rotated_copy_cw(m):
               n = len(m)
-              return [[m[n-1-j][i] for j in range(n)] for i in range(n)]
+              return [[m[n - 1 - j][i] for j in range(n)] for i in range(n)]
 
           cases = [
               [[1, 2, 3],
@@ -98,7 +101,6 @@ jobs:
               m = copy.deepcopy(original)
               expected = rotated_copy_cw(original)
 
-              # garder les id pour vérifier l'in-place
               matrix_id = id(m)
               rows_id = [id(r) for r in m]
 
