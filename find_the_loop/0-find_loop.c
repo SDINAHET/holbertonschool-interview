@@ -4,7 +4,8 @@
  * find_listint_loop - Finds the start node of a loop in a singly linked list.
  * @head: Pointer to the head of the list.
  *
- * Return: Address of the node where the loop starts, or NULL if there is no loop.
+ * Return: Address of the node where the loop starts, or NULL if there is no
+ * loop.
  *
  * Constraints respected:
  * - No malloc/free/arrays
