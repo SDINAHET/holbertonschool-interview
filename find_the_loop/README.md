@@ -13,6 +13,20 @@ All tests passed ✅
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/find_the_loop#
 
 
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/find_the_loop# gcc -Wall -Werror -Wextra -pedantic 0-find_loop.c lib.c test_checker_like.c -o tests_checker
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/find_the_loop# ./tests_check
+er
+Running checker-like tests...
+OK - two nodes loop to first
+OK - single node self-loop
+OK - 150 nodes, tail->121st
+OK - 150 nodes, no loop
+OK - NULL input
+OK - 150 nodes, no loop (bis)
+All checker-like tests passed ✅
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/find_the_loop#
+
+
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/find_the_loop# ./main
 [0x5579a5e51380] 1024
 [0x5579a5e51360] 402
