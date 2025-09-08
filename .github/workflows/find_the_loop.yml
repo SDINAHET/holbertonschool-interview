@@ -134,7 +134,7 @@ jobs:
 
           echo "OK: no malloc/free detected in find_listint_loop"
 
-        - name: Install Betty (style & doc)
+      - name: Install Betty (style & doc)
         run: |
           sudo apt-get update -y
           sudo apt-get install -y git perl
