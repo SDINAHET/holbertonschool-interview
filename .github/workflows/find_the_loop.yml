@@ -142,18 +142,33 @@ jobs:
 
       - name: Install Betty (style & doc)
         run: |
-          set -e
+          set -euxo pipefail
           sudo apt-get update -y
           sudo apt-get install -y git perl
           git clone --depth=1 https://github.com/holbertonschool/Betty.git /tmp/Betty
-          sudo bash /tmp/Betty/install.sh
-          # expose /usr/local/bin aux steps suivants
+
+          # Essai standard via le script d'install
+          (cd /tmp/Betty && sudo ./install.sh) || true
+
+          # Fallback manuel si le wrapper n'existe pas encore
+          if [ ! -x /usr/local/bin/betty ]; then
+            sudo cp /tmp/Betty/betty /usr/local/bin/betty || true
+            sudo cp /tmp/Betty/betty-style.pl /usr/local/bin/betty-style || true
+            sudo cp /tmp/Betty/betty-doc.pl /usr/local/bin/betty-doc || true
+            sudo chmod +x /usr/local/bin/betty /usr/local/bin/betty-style /usr/local/bin/betty-doc || true
+          fi
+
+          # Debug + PATH pour les steps suivants
+          ls -l /usr/local/bin | grep -E 'betty($|-|_)' || true
           echo "/usr/local/bin" >> "$GITHUB_PATH"
-          /usr/local/bin/betty --version || true
 
       - name: Betty style & doc check
         working-directory: find_the_loop
         shell: bash
         run: |
-          # vérifie 0-find_loop.c (ou remplace par: /usr/local/bin/betty *.c *.h)
-          /usr/local/bin/betty 0-find_loop.c
+          set -e
+          # Vérifie que betty est réellement disponible
+          command -v betty || { echo "betty introuvable après installation"; exit 127; }
+          # Lancer sur 0-find_loop.c (ou sur tous: betty *.c *.h)
+          betty 0-find_loop.c
+
