@@ -153,8 +153,8 @@ jobs:
         run: |
         #   # Vérifie tous les .c et .h du dossier
         #   betty *.c *.h
-        # vérifie 0-find_loop.c
-            betty 0-find_loop.c
+          # vérifie 0-find_loop.c
+          betty 0-find_loop.c
 
       - name: Optional - Betty style (runs only if betty is available)
         working-directory: find_the_loop
