@@ -1,0 +1,118 @@
+name: Find the Loop CI
+
+on:
+  push:
+    paths:
+      - 'find_the_loop/**'
+  pull_request:
+    paths:
+      - 'find_the_loop/**'
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc valgrind ltrace make
+
+      - name: Ensure required files exist
+        working-directory: find_the_loop
+        run: |
+          test -s 0-find_loop.c
+          test -s lists.h
+          test -s lib.c
+          test -s 0-main.c
+          test -s test_find_loop.c
+          # third test (checker-like)
+          test -s test_checker_like.c
+          # no-alloc main for ltrace check
+          test -s no_alloc_main.c
+          test -s README.md
+
+      - name: Quick header guard & prototype check
+        working-directory: find_the_loop
+        run: |
+          grep -q "#ifndef _LISTS_H_" lists.h
+          grep -q "#define _LISTS_H_" lists.h
+          grep -q "typedef struct listint_s" lists.h
+          grep -q "listint_t \\*find_listint_loop(listint_t \\*head);" lists.h
+
+      - name: Heuristic check - max two vars & no arrays in function
+        working-directory: find_the_loop
+        shell: bash
+        run: |
+          # Extract the function body of find_listint_loop and check:
+          # 1) No array declarations (no '[' inside the function)
+          # 2) At most two 'listint_t *' variable declarations
+          awk 'f{print} /listint_t \\*find_listint_loop\\(listint_t \\*head\\)/{f=1} f&&/\\}/{print;exit}' 0-find_loop.c > _func.c
+          if grep -q '\\[' _func.c; then
+            echo "Array declaration detected in function body"; exit 1
+          fi
+          # Count listint_t pointer variable declarations in the function body (heuristic)
+          # Looks for patterns like: listint_t *slow; or listint_t *slow = head; or listint_t *a, *b;
+          cnt=$(grep -Eo 'listint_t[[:space:]]*\\*[^;]+' _func.c | sed 's/,/\\n/g' | wc -l)
+          if [ "$cnt" -gt 2 ]; then
+            echo "More than two variables declared in find_listint_loop (found $cnt)"; exit 1
+          fi
+          echo "Heuristic var check OK (<=2) & no arrays."
+          rm -f _func.c
+
+      - name: Compile main (using lib.c)
+        working-directory: find_the_loop
+        run: |
+          gcc -Wall -Werror -Wextra -pedantic 0-find_loop.c lib.c 0-main.c -o main
+
+      - name: Run main (sample output)
+        working-directory: find_the_loop
+        run: ./main
+
+      - name: Compile unit tests (1)
+        working-directory: find_the_loop
+        run: |
+          gcc -Wall -Werror -Wextra -pedantic 0-find_loop.c lib.c test_find_loop.c -o tests
+
+      - name: Run unit tests (1)
+        working-directory: find_the_loop
+        run: ./tests
+
+      - name: Compile unit tests (checker-like)
+        working-directory: find_the_loop
+        run: |
+          gcc -Wall -Werror -Wextra -pedantic 0-find_loop.c lib.c test_checker_like.c -o tests_checker
+
+      - name: Run unit tests (checker-like)
+        working-directory: find_the_loop
+        run: ./tests_checker
+
+      - name: Memory leak check with Valgrind (checker-like)
+        working-directory: find_the_loop
+        run: |
+          valgrind --leak-check=full --error-exitcode=1 ./tests_checker
+
+      - name: ltrace check (no malloc/free in YOUR function)
+        working-directory: find_the_loop
+        run: |
+          gcc -Wall -Werror -Wextra -pedantic 0-find_loop.c no_alloc_main.c -o no_alloc
+          # Should produce NO malloc/free calls at runtime
+          set +e
+          ltrace -e malloc,free ./no_alloc 2> _ltrace.log
+          set -e
+          if [ -s _ltrace.log ]; then
+            echo "malloc/free detected (should not be in your function)"; cat _ltrace.log; exit 1
+          fi
+          echo "OK: no malloc/free seen by ltrace in no_alloc path."
+
+      - name: Optional - Betty style (runs only if betty is available)
+        working-directory: find_the_loop
+        shell: bash
+        run: |
+          if command -v betty >/dev/null 2>&1; then
+            betty 0-find_loop.c || exit 1
+          else
+            echo "Betty not installed, skipping."
+          fi
