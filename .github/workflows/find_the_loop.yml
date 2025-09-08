@@ -134,6 +134,20 @@ jobs:
 
           echo "OK: no malloc/free detected in find_listint_loop"
 
+        - name: Install Betty (style & doc)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y git perl
+          git clone --depth=1 https://github.com/holbertonschool/Betty.git /tmp/Betty
+          sudo bash /tmp/Betty/install.sh
+          betty --version || true
+
+      - name: Betty style & doc check
+        working-directory: find_the_loop
+        run: |
+          # Vérifie tous les .c et .h du dossier
+          betty *.c *.h
+
       - name: Optional - Betty style (runs only if betty is available)
         working-directory: find_the_loop
         shell: bash
