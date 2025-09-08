@@ -153,13 +153,3 @@ jobs:
         run: |
           # vérifie 0-find_loop.c
           betty 0-find_loop.c
-
-      - name: Optional - Betty style (runs only if betty is available)
-        working-directory: find_the_loop
-        shell: bash
-        run: |
-          if command -v betty >/dev/null 2>&1; then
-            betty 0-find_loop.c || exit 1
-          else
-            echo "Betty not installed, skipping."
-          fi
