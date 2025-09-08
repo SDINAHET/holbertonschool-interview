@@ -1,9 +1,15 @@
 name: Find the Loop CI
 
 on:
+  workflow_dispatch:   # permet de lancer manuellement depuis l’onglet Actions
   push:
+    branches: ["**"]
     paths:
       - 'find_the_loop/**'
+      - '.github/workflows/find_the_loop.yml'   # <-- pour déclencher quand tu modifies le YAML
+#   push:
+#     paths:
+#       - 'find_the_loop/**'
   pull_request:
     paths:
       - 'find_the_loop/**'
