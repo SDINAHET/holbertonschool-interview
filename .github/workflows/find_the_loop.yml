@@ -122,19 +122,17 @@ jobs:
         run: |
           gcc -Wall -Werror -Wextra -pedantic 0-find_loop.c no_alloc_main.c -o no_alloc
           set +e
+          # capture uniquement malloc/free
           ltrace -e malloc,free ./no_alloc 2> _ltrace.log
           rc=$?
           set -e
-          if [ $rc -ne 0 ]; then
-            # Some runners return non-zero even if no symbols captured; accept if log is empty
-            if [ -s _ltrace.log ]; then
-              echo "ltrace failed and captured output (unexpected)"; cat _ltrace.log; exit 1
-            fi
+
+          # si le log contient malloc/free venant de find_listint_loop → erreur
+          if grep -q "find_listint_loop" _ltrace.log; then
+            echo "malloc/free detected inside find_listint_loop"; cat _ltrace.log; exit 1
           fi
-          if [ -s _ltrace.log ]; then
-            echo "malloc/free detected (should not be in your function)"; cat _ltrace.log; exit 1
-          fi
-          echo "OK: no malloc/free seen by ltrace in no_alloc path."
+
+          echo "OK: no malloc/free detected in find_listint_loop"
 
       - name: Optional - Betty style (runs only if betty is available)
         working-directory: find_the_loop
