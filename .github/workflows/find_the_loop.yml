@@ -142,14 +142,18 @@ jobs:
 
       - name: Install Betty (style & doc)
         run: |
+          set -e
           sudo apt-get update -y
           sudo apt-get install -y git perl
           git clone --depth=1 https://github.com/holbertonschool/Betty.git /tmp/Betty
           sudo bash /tmp/Betty/install.sh
-          betty --version || true
+          # expose /usr/local/bin aux steps suivants
+          echo "/usr/local/bin" >> "$GITHUB_PATH"
+          /usr/local/bin/betty --version || true
 
       - name: Betty style & doc check
         working-directory: find_the_loop
+        shell: bash
         run: |
-          # vérifie 0-find_loop.c
-          betty 0-find_loop.c
+          # vérifie 0-find_loop.c (ou remplace par: /usr/local/bin/betty *.c *.h)
+          /usr/local/bin/betty 0-find_loop.c
