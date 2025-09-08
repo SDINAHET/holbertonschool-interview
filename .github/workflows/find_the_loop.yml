@@ -151,8 +151,6 @@ jobs:
       - name: Betty style & doc check
         working-directory: find_the_loop
         run: |
-        #   # Vérifie tous les .c et .h du dossier
-        #   betty *.c *.h
           # vérifie 0-find_loop.c
           betty 0-find_loop.c
 
