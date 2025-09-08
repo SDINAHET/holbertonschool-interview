@@ -1,5 +1,7 @@
 # find_the_loop
 
+![Find the Loop CI](https://github.com/SDINAHET/holbertonschool-interview/actions/workflows/find_the_loop.yml/badge.svg)
+
 
 ```bash
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/find_the_loop# gcc -Wall -Werror -Wextra -pedantic 0-find_loop.c test_find_loop.c -o tests
@@ -51,5 +53,3 @@ root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonscho
 Loop starts at [0x5579a5e517d0] 7
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/find_the_loop#
 ```
-
-
