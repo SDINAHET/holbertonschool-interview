@@ -11,6 +11,7 @@ on:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -28,10 +29,8 @@ jobs:
           test -s lib.c
           test -s 0-main.c
           test -s test_find_loop.c
-          # third test (checker-like)
-          test -s test_checker_like.c
-          # no-alloc main for ltrace check
-          test -s no_alloc_main.c
+          test -s test_checker_like.c     # 3rd test “checker-like”
+          test -s no_alloc_main.c         # for ltrace anti-malloc/free
           test -s README.md
 
       - name: Quick header guard & prototype check
@@ -46,19 +45,43 @@ jobs:
         working-directory: find_the_loop
         shell: bash
         run: |
-          # Extract the function body of find_listint_loop and check:
-          # 1) No array declarations (no '[' inside the function)
-          # 2) At most two 'listint_t *' variable declarations
-          awk 'f{print} /listint_t \\*find_listint_loop\\(listint_t \\*head\\)/{f=1} f&&/\\}/{print;exit}' 0-find_loop.c > _func.c
-          if grep -q '\\[' _func.c; then
+          # Extract the function body of find_listint_loop with brace counting
+          awk '
+            /listint_t[[:space:]]*\*find_listint_loop[[:space:]]*\(listint_t[[:space:]]*\*head\)/ {
+              print; infunc=1; depth=0; next
+            }
+            infunc {
+              op=gsub(/\{/, "{"); cl=gsub(/\}/, "}")
+              depth+=op; depth-=cl
+              print
+              if (depth==0 && cl>0) exit
+            }
+          ' 0-find_loop.c > _func.c
+
+          # No arrays inside the function
+          if grep -q '\[' _func.c; then
             echo "Array declaration detected in function body"; exit 1
           fi
-          # Count listint_t pointer variable declarations in the function body (heuristic)
-          # Looks for patterns like: listint_t *slow; or listint_t *slow = head; or listint_t *a, *b;
-          cnt=$(grep -Eo 'listint_t[[:space:]]*\\*[^;]+' _func.c | sed 's/,/\\n/g' | wc -l)
-          if [ "$cnt" -gt 2 ]; then
+
+          # Count declared listint_t* variables (ignore the signature)
+          cnt=$(
+            awk '
+              /listint_t[[:space:]]*\*/ && $0 !~ /find_listint_loop/ {
+                line=$0
+                sub(/^[[:space:]]*/, "", line)
+                gsub(/[[:space:]]+/, " ", line)
+                sub(/^.*\*/, "*", line)
+                split(line, sem, ";")
+                n=split(sem[1], parts, ",")
+                print n
+              }
+            ' _func.c | awk '{s+=$1} END{print s+0}'
+          )
+
+          if [ "${cnt:-0}" -gt 2 ]; then
             echo "More than two variables declared in find_listint_loop (found $cnt)"; exit 1
           fi
+
           echo "Heuristic var check OK (<=2) & no arrays."
           rm -f _func.c
 
@@ -71,12 +94,12 @@ jobs:
         working-directory: find_the_loop
         run: ./main
 
-      - name: Compile unit tests (1)
+      - name: Compile unit tests (core)
         working-directory: find_the_loop
         run: |
           gcc -Wall -Werror -Wextra -pedantic 0-find_loop.c lib.c test_find_loop.c -o tests
 
-      - name: Run unit tests (1)
+      - name: Run unit tests (core)
         working-directory: find_the_loop
         run: ./tests
 
@@ -98,10 +121,16 @@ jobs:
         working-directory: find_the_loop
         run: |
           gcc -Wall -Werror -Wextra -pedantic 0-find_loop.c no_alloc_main.c -o no_alloc
-          # Should produce NO malloc/free calls at runtime
           set +e
           ltrace -e malloc,free ./no_alloc 2> _ltrace.log
+          rc=$?
           set -e
+          if [ $rc -ne 0 ]; then
+            # Some runners return non-zero even if no symbols captured; accept if log is empty
+            if [ -s _ltrace.log ]; then
+              echo "ltrace failed and captured output (unexpected)"; cat _ltrace.log; exit 1
+            fi
+          fi
           if [ -s _ltrace.log ]; then
             echo "malloc/free detected (should not be in your function)"; cat _ltrace.log; exit 1
           fi
