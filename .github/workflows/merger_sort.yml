@@ -1,0 +1,60 @@
+name: Merge Sort - Full CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: merge_sort
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assert required files present
+        run: |
+          set -e
+          for f in 0-merge_sort.c 0-O print_array.c sort.h Makefile \
+                   tests/test_merge_sort.c tests/demo_main.c \
+                   scripts/one_alloc_check.sh expected/demo_output.txt checker.sh
+          do
+            [ -f "$f" ] || { echo "Missing file: $f" ; exit 1; }
+          done
+          echo "All files present ✅"
+
+      - name: Install deps (gcc, make, ltrace)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc make ltrace
+
+      - name: Install Betty (style + doc)
+        run: |
+          git clone --depth=1 https://github.com/holbertonschool/Betty.git
+          cd Betty && sudo ./install.sh || true
+
+      - name: Build demo and tests
+        run: make all test
+
+      - name: Unit tests (10 cases)
+        run: make test && ./tests_runner
+
+      - name: Check 0-O exact
+        run: make check-o
+
+      - name: Source-level single malloc/free
+        run: bash scripts/one_alloc_check.sh
+
+      - name: Best-effort runtime malloc/free (ltrace)
+        run: make ltracecheck
+
+      - name: Betty (style + doc)
+        run: make betty
+
+      - name: Verify exact demo output
+        run: make verify-demo
+
+      - name: Final checker script (aggregated)
+        run: bash checker.sh
