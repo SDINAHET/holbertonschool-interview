@@ -1,5 +1,5 @@
 # .github/workflows/making_change.yml
-name: Python CI
+name: making_change CI
 
 on:
   push:
