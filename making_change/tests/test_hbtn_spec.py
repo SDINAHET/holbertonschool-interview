@@ -10,7 +10,6 @@ Checks 'style Holberton' exécutés en CI:
 """
 
 import os
-import re
 import time
 import importlib.util
 import unittest
@@ -38,7 +37,7 @@ class TestHbtnSpec(unittest.TestCase):
         with open(TARGET, 'r', encoding='utf-8') as f:
             first = f.readline().rstrip('\n')
         self.assertEqual(first, "#!/usr/bin/python3",
-                         "La première ligne doit être  #!/usr/bin/python3")
+                         "La première ligne doit être #!/usr/bin/python3")
 
     def test_module_docstring(self):
         spec = importlib.util.spec_from_file_location('mc_mod', TARGET)
@@ -67,8 +66,8 @@ class TestHbtnSpec(unittest.TestCase):
 
     def test_large_total_impossible(self):
         makeChange = load_makeChange()
-        # 999998 est pair -> combinaison 4/6 possible ? Ici on utilise [5,7] => 999998 est non atteignable
-        self.assertEqual(makeChange([5, 7], 999_998), -1)
+        # VRAI impossible : PGCD(6,10)=2, total impair -> inatteignable
+        self.assertEqual(makeChange([6, 10], 999_999), -1)
 
     def test_large_total_possible_with_coprime(self):
         makeChange = load_makeChange()
@@ -83,7 +82,7 @@ class TestHbtnSpec(unittest.TestCase):
         elapsed = time.time() - start
         # 25 * 800 = 20000 -> 800 pièces attendues
         self.assertEqual(res, 800)
-        # Garde-fou perf: ~0.8s est large pour du CI, ajuste si besoin
+        # Garde-fou perf: ~1.5s pour rester confortable en CI
         self.assertLess(elapsed, 1.5, "Calcul trop lent (>1.5s)")
 
     def test_non_canonical(self):
@@ -93,7 +92,7 @@ class TestHbtnSpec(unittest.TestCase):
 
     def test_large_coin_values(self):
         makeChange = load_makeChange()
-        # Correction: le minimum est 102 (reste 99 => 99 pièces de 1 au minimum
+        # Correction: le minimum est 102 (reste 99 => au moins 99 pièces de 1)
         self.assertEqual(makeChange([100, 200, 500, 1], 999), 102)
         self.assertEqual(makeChange([1, 100, 200, 500], 999), 102)
 
