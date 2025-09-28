@@ -39,6 +39,7 @@ jobs:
           which python
           pip -V
 
+      # pip 25+ ne supporte plus Python 3.8
       - name: Upgrade pip safely on 3.8
         if: matrix.python-version == '3.8'
         run: |
