@@ -67,9 +67,14 @@ class TestHbtnSpec(unittest.TestCase):
 
     def test_large_total_impossible(self):
         makeChange = load_makeChange()
-        # 999998 est pair -> combinaison 4/6 possible ?
-        # Ici on utilise [5,7] => 999998 est non atteignable
+        # 999998 est pair -> combinaison 4/6 possible ? Ici on utilise [5,7] => 999998 est non atteignable
         self.assertEqual(makeChange([5, 7], 999_998), -1)
+
+    def test_large_total_possible_with_coprime(self):
+        makeChange = load_makeChange()
+        # PGCD(5,7)=1 => toutes les sommes >= 24 sont atteignables
+        res = makeChange([5, 7], 999_998)
+        self.assertNotEqual(res, -1)
 
     def test_perf_guard(self):
         makeChange = load_makeChange()
