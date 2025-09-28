@@ -64,12 +64,13 @@ class TestMakingChange(unittest.TestCase):
         self.assertEqual(makeChange([9, 6, 5, 1], 11), 2)  # 6+5
 
     def test_large_coin_values(self):
-        self.assertEqual(makeChange([100, 200, 500, 1], 999), 13)  # 9*100 + 99*1 ? Non: 500+200+200+ 99*1 => 1s minimisés -> 500+200+200+99*1 = 1+1+1+99=102 (trop)
-        # Mieux: 9*100 = 900, reste 99 -> 99*1 -> total 9+99 = 108
-        # Mais 500 + 4*100 = 900, reste 99 -> 500 (1) + 100*4 (4) + 99*1 (99) = 104
-        # 200*4 = 800, reste 199 -> 200*3=600, reste 399 -> 200 (3) + 100 (3) +  - pas mieux
-        # La meilleure solution est 500 (1) + 200 (2) + 99*1 (99) = 102
-        # Donc attendons 102
+        # Mauvais attendu supprimé : 13 est impossible
+        # self.assertEqual(makeChange([100, 200, 500, 1], 999), 13)
+
+        # Attendu correct : 102 (500 + 200 + 200 + 99×1)
+        self.assertEqual(makeChange([100, 200, 500, 1], 999), 102)
+
+        # Variante équivalente (ordre des coins différent)
         self.assertEqual(makeChange([1, 100, 200, 500], 999), 102)
 
 
