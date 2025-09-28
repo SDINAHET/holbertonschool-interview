@@ -2,7 +2,16 @@ name: Merge Sort - Full CI
 
 on:
   push:
+    paths:
+      - "merger_sort/**"
+      - ".github/workflows/merger_sort.yml"
   pull_request:
+    paths:
+      - "merger_sort/**"
+      - ".github/workflows/merger_sort.yml"
+# on:
+#   push:
+#   pull_request:
 
 jobs:
   ci:
