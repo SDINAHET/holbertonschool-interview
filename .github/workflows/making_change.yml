@@ -1,3 +1,4 @@
+# .github/workflows/making_change.yml
 name: Python CI
 
 on:
@@ -10,7 +11,6 @@ on:
       - "making_change/**"
       - ".github/workflows/making_change.yml"
 
-# Annule proprement les runs précédents sur la même branche
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -32,7 +32,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
 
       - name: Show Python version
         run: |
@@ -40,7 +39,6 @@ jobs:
           which python
           pip -V
 
-      # IMPORTANT : pip 25+ ne supporte plus Python 3.8 -> on le borne
       - name: Upgrade pip safely on 3.8
         if: matrix.python-version == '3.8'
         run: |
