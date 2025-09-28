@@ -10,12 +10,20 @@ on:
       - "making_change/**"
       - ".github/workflows/making_change.yml"
 
+# Annule proprement les runs précédents sur la même branche
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.8", "3.10", "3.12"]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,10 +32,29 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: "pip"
 
-      - name: Install tooling
+      - name: Show Python version
+        run: |
+          python -V
+          which python
+          pip -V
+
+      # IMPORTANT : pip 25+ ne supporte plus Python 3.8 -> on le borne
+      - name: Upgrade pip safely on 3.8
+        if: matrix.python-version == '3.8'
+        run: |
+          python -m pip install --upgrade "pip<25"
+          pip -V
+
+      - name: Upgrade pip on >=3.9
+        if: matrix.python-version != '3.8'
         run: |
           python -m pip install --upgrade pip
+          pip -V
+
+      - name: Install test tools
+        run: |
           pip install coverage pycodestyle
 
       - name: PEP 8 (pycodestyle)
