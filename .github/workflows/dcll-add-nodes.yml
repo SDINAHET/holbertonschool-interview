@@ -1,0 +1,101 @@
+name: C – 0. Add Nodes (Double Circular Linked List)
+
+on:
+  push:
+    paths:
+      - "double_circular_linked_list/**"
+      - ".github/workflows/dcll-add-nodes.yml"
+  pull_request:
+    paths:
+      - "double_circular_linked_list/**"
+      - ".github/workflows/dcll-add-nodes.yml"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: double_circular_linked_list
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install deps (gcc, valgrind, ltrace, perl)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc valgrind ltrace perl
+
+      - name: Install Betty
+        run: |
+          git clone https://github.com/holbertonschool/Betty.git
+          cd Betty && sudo ./install.sh
+          betty --version || true
+
+      # ----- Vérifs "Correction of 0. Add Nodes" -----
+
+      - name: README.md exists and is not empty
+        run: test -s README.md
+
+      - name: Files exist
+        run: |
+          test -f 0-add_node.c
+          test -f list.h
+          test -f tests/test_add_nodes.c
+
+      - name: Program compiles (tests)
+        run: |
+          gcc -Wall -Wextra -Werror -pedantic -D_POSIX_C_SOURCE=200809L \
+              tests/test_add_nodes.c 0-add_node.c -o tests/test_runner
+
+      - name: Run tests
+        run: ./tests/test_runner
+
+      - name: Program compiles (0-main.c if present)
+        run: |
+          if [ -f 0-main.c ]; then
+            gcc -Wall -Wextra -Werror -pedantic 0-main.c 0-add_node.c -o a.out
+            ./a.out || true
+          fi
+
+      - name: Allowed functions (nm on 0-add_node.o)
+        run: |
+          gcc -Wall -Wextra -Werror -pedantic -c 0-add_node.c -o 0-add_node.o
+          echo "Undefined symbols in 0-add_node.o:"
+          nm -u 0-add_node.o || true
+          # Autorisés: malloc, free, strdup
+          disallowed=$(nm -u 0-add_node.o | awk '{print $2}' | grep -Ev '^(malloc|free|strdup)$' || true)
+          if [ -n "$disallowed" ]; then
+            echo "::error::Disallowed functions detected in 0-add_node.c: $disallowed"
+            exit 1
+          fi
+
+      - name: ltrace allowed functions (sanity)
+        run: |
+          # On s'assure qu'aucun appel interdit (calloc/realloc/puts) n'apparaît à l'exécution
+          ltrace -o ltrace.log -f ./tests/test_runner || true
+          if grep -E 'calloc\(|realloc\(|puts\(' ltrace.log; then
+            echo "::error::Disallowed libc calls detected at runtime."
+            exit 1
+          fi
+          echo "ltrace allowed functions: malloc, free, strdup, printf"
+
+      - name: Valgrind (no leaks)
+        run: |
+          valgrind --error-exitcode=1 --leak-check=full --track-origins=yes ./tests/test_runner
+
+      - name: Betty (coding + documentation style)
+        run: betty 0-add_node.c list.h
+
+      - name: Summary
+        run: |
+          echo 'Correction of "0. Add Nodes"'
+          echo 'Congratulations! All tests passed successfully!'
+          echo 'You are ready for your next mission!'
+          echo
+          echo 'Result:'
+          echo 'README.md exists and is not empty'
+          echo 'Files exist'
+          echo 'Program compiles'
+          echo 'ltrace allowed functions: malloc, free, strdup, printf'
+          echo 'Return SUCCESS'
