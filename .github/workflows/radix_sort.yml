@@ -1,0 +1,83 @@
+name: Radix Sort - CI
+
+on:
+  push:
+    paths:
+      - "radix_sort/**"
+      - ".github/workflows/radix_sort.yml"
+  pull_request:
+    paths:
+      - "radix_sort/**"
+      - ".github/workflows/radix_sort.yml"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: radix_sort
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure files are present
+        run: |
+          set -e
+          for f in "0-radix_sort.c" "sort.h" "print_array.c"; do
+            [ -f "$f" ] || { echo "::error file=$f::Missing required file: $f"; exit 1; }
+          done
+          echo "Files are present"
+
+      - name: Install build deps
+        run: sudo apt-get update && sudo apt-get install -y build-essential
+
+      - name: Compile sample program (C89, strict flags)
+        run: |
+          gcc -std=c89 -Wall -Wextra -Werror -pedantic \
+              0-main.c 0-radix_sort.c print_array.c -o radix
+          echo "Compile program"
+
+      - name: Run sample program
+        run: |
+          ./radix || { echo "::error::Program crashed"; exit 1; }
+
+      - name: Compile unit tests (if present)
+        run: |
+          if [ -f tests/tests_radix.c ]; then
+            echo "Found tests/tests_radix.c — compiling tests"
+            gcc -std=c89 -Wall -Wextra -Werror -pedantic -g \
+                tests/tests_radix.c 0-radix_sort.c print_array.c -I . -o tests_radix
+          else
+            echo "No tests/tests_radix.c found — skipping unit tests compile"
+          fi
+
+      - name: Run unit tests (if built)
+        run: |
+          if [ -x ./tests_radix ]; then
+            ./tests_radix > /dev/null
+          else
+            echo "Unit test binary not found — skipping test run"
+          fi
+        timeout-minutes: 5
+
+      - name: Install Betty (style & doc)
+        run: |
+          sudo apt-get install -y git perl
+          git clone --depth=1 https://github.com/holbertonschool/Betty ../Betty
+          sudo cp ../Betty/betty-style.pl /usr/local/bin/betty-style.pl
+          sudo cp ../Betty/betty-doc.pl   /usr/local/bin/betty-doc.pl
+          sudo chmod +x /usr/local/bin/betty-*.pl
+
+      - name: Betty coding style
+        run: |
+          betty-style.pl 0-radix_sort.c sort.h
+
+      - name: Betty documentation style
+        run: |
+          betty-doc.pl 0-radix_sort.c sort.h
+
+      - name: Final result
+        run: |
+          echo 'Congratulations! All tests passed successfully!'
+          echo 'You are ready for your next mission!'
