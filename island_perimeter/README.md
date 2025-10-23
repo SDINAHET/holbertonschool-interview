@@ -69,3 +69,38 @@ tests/test_island_perimeter_unittest.py::TestIslandPerimeter::test_single_cell P
 ================================================= 11 passed in 0.14s ==================================================
 root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/island_perimeter#
 ```
+
+```bash
+python3 -m unittest tests.test_checker_like -v
+pytest -v tests/test_checker_like.py
+```
+
+```bash
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/island_perimeter# python3 -m unittest tests.test_checker_like -v
+test_docstrings (tests.test_checker_like.TestCheckerLike) ... ok
+test_file_exists (tests.test_checker_like.TestCheckerLike) ... ok
+test_grids_from_checker (tests.test_checker_like.TestCheckerLike) ... ok
+test_no_imports (tests.test_checker_like.TestCheckerLike) ... ok
+test_shebang_exact (tests.test_checker_like.TestCheckerLike) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.013s
+
+OK
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/island_perimeter# pytest -v tests/test_checker_like.py
+================================================= test session starts =================================================
+platform linux -- Python 3.10.12, pytest-7.3.1, pluggy-1.5.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/island_perimeter
+plugins: flask-1.2.0, allure-pytest-2.10.0, mock-3.11.1, cov-4.1.0, anyio-4.8.0
+collected 5 items
+
+tests/test_checker_like.py::TestCheckerLike::test_docstrings PASSED                                             [ 20%]
+tests/test_checker_like.py::TestCheckerLike::test_file_exists PASSED                                            [ 40%]
+tests/test_checker_like.py::TestCheckerLike::test_grids_from_checker PASSED                                     [ 60%]
+tests/test_checker_like.py::TestCheckerLike::test_no_imports PASSED                                             [ 80%]
+tests/test_checker_like.py::TestCheckerLike::test_shebang_exact PASSED                                          [100%]
+
+================================================== 5 passed in 0.14s ==================================================
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/island_perimeter#
+```
