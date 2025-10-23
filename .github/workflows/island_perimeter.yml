@@ -11,16 +11,11 @@ on:
       - ".github/workflows/island_perimeter.yml"
 
 jobs:
-  lint-and-test:
+  legacy-checker:
+    name: Legacy checker (Python 3.4, PEP8 1.7)
     runs-on: ubuntu-latest
-
-    # On exécute tout dans un conteneur Python 3.4 pour coller au checker Holberton
     container:
       image: python:3.4
-
-    defaults:
-      run:
-        shell: bash
 
     steps:
       - name: Checkout
@@ -29,13 +24,7 @@ jobs:
       - name: Ensure expected paths exist
         run: |
           test -d island_perimeter || (echo "Missing island_perimeter directory" && exit 1)
-
-      - name: Verify README exists at repo root
-        run: |
           test -f README.md || (echo "Missing README.md at repository root" && exit 1)
-
-      - name: Verify target file exists
-        run: |
           test -f island_perimeter/0-island_perimeter.py || (echo "Missing island_perimeter/0-island_perimeter.py" && exit 1)
           test -f island_perimeter/0-main.py || (echo "Missing island_perimeter/0-main.py" && exit 1)
 
@@ -46,19 +35,12 @@ jobs:
           head -n1 island_perimeter/0-main.py | grep -qx '#!/usr/bin/python3' \
             || (echo "First line of 0-main.py must be exactly '#!/usr/bin/python3'" && exit 1)
 
-      - name: Verify file is executable
+      - name: Verify executables + newline
         run: |
-          test -x island_perimeter/0-island_perimeter.py \
-            || (echo "0-island_perimeter.py must be executable (chmod +x)" && exit 1)
-          test -x island_perimeter/0-main.py \
-            || (echo "0-main.py must be executable (chmod +x)" && exit 1)
-
-      - name: Verify file ends with newline
-        run: |
-          tail -c1 island_perimeter/0-island_perimeter.py | od -An -t x1 | grep -q '0a' \
-            || (echo "0-island_perimeter.py must end with a newline" && exit 1)
-          tail -c1 island_perimeter/0-main.py | od -An -t x1 | grep -q '0a' \
-            || (echo "0-main.py must end with a newline" && exit 1)
+          test -x island_perimeter/0-island_perimeter.py || (echo "0-island_perimeter.py must be executable (chmod +x)" && exit 1)
+          test -x island_perimeter/0-main.py || (echo "0-main.py must be executable (chmod +x)" && exit 1)
+          tail -c1 island_perimeter/0-island_perimeter.py | od -An -t x1 | grep -q '0a' || (echo "0-island_perimeter.py must end with a newline" && exit 1)
+          tail -c1 island_perimeter/0-main.py | od -An -t x1 | grep -q '0a' || (echo "0-main.py must end with a newline" && exit 1)
 
       - name: Enforce 'no imports' rule
         run: |
@@ -74,13 +56,12 @@ jobs:
 
       - name: Run PEP8 (pep8 1.7.0)
         run: |
-          pep8 --version
           pep8 --show-source --show-pep8 island_perimeter/0-island_perimeter.py island_perimeter/0-main.py
 
       - name: Verify docstrings on module and function
         run: |
           python - << 'PY'
-          import importlib.util, sys, os
+          import importlib.util, os
           p = os.path.abspath('island_perimeter/0-island_perimeter.py')
           spec = importlib.util.spec_from_file_location('island', p)
           mod = importlib.util.module_from_spec(spec)
@@ -94,13 +75,11 @@ jobs:
 
       - name: Run sample test (expected output 12)
         run: |
-          set -e
-          echo "Running 0-main.py"
           out="$(python3 island_perimeter/0-main.py)"
           echo "Output: $out"
           test "$out" = "12" || (echo "Expected output '12' but got '$out'" && exit 1)
 
-      - name: Smoke import and call
+      - name: Smoke import and call + extra grids
         run: |
           python3 - << 'PY'
           import importlib.util, os
@@ -108,13 +87,40 @@ jobs:
           spec = importlib.util.spec_from_file_location('island', p)
           mod = importlib.util.module_from_spec(spec)
           spec.loader.exec_module(mod)
-          grid = [
+          f = mod.island_perimeter
+          assert f([
               [0,0,0,0,0,0],
               [0,1,0,0,0,0],
               [0,1,0,0,0,0],
               [0,1,1,1,0,0],
               [0,0,0,0,0,0]
-          ]
-          assert mod.island_perimeter(grid) == 12
-          print("Function output OK")
+          ]) == 12
+          assert f([[0],[0],[0]]) == 0
+          assert f([[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]]) == 16
+          print("Checker-like grids OK")
           PY
+
+  tests:
+    name: Tests (pytest + unittest, Python 3.10)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install test deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: Run unittest (discovery)
+        run: |
+          python -m unittest discover -s island_perimeter/tests -p "test_*unittest.py" -v
+
+      - name: Run pytest (all tests, including checker-like)
+        run: |
+          pytest -v island_perimeter/tests
