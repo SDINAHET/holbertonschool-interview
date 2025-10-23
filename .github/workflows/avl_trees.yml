@@ -1,0 +1,65 @@
+name: AVL Trees CI
+
+on:
+  push:
+    paths:
+      - "avl_trees/**"
+      - ".github/workflows/avl_trees.yml"
+  pull_request:
+    paths:
+      - "avl_trees/**"
+      - ".github/workflows/avl_trees.yml"
+
+jobs:
+  build:
+    name: AVL Trees CI / Compile + Run (C, Ubuntu 22.04)
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify required files
+        run: |
+          test -d avl_trees || (echo "❌ Missing avl_trees directory" && exit 1)
+          test -f avl_trees/0-binary_tree_is_avl.c || (echo "❌ Missing 0-binary_tree_is_avl.c" && exit 1)
+          test -f avl_trees/binary_tree_print.c || (echo "❌ Missing binary_tree_print.c" && exit 1)
+          test -f avl_trees/binary_tree_node.c || (echo "❌ Missing binary_tree_node.c" && exit 1)
+          test -f avl_trees/binary_trees.h || (echo "❌ Missing binary_trees.h" && exit 1)
+          test -f avl_trees/0-main.c || (echo "❌ Missing 0-main.c" && exit 1)
+          echo "✅ All required files are present"
+
+      - name: Install dependencies (build tools)
+        run: |
+          sudo apt update -y
+          sudo apt install -y build-essential betty
+
+      - name: Run Betty style check
+        run: |
+          echo "🔎 Checking Betty style..."
+          betty avl_trees/*.c avl_trees/*.h || (echo "❌ Betty style errors found" && exit 1)
+          echo "✅ Betty style passed"
+
+      - name: Compile all files
+        run: |
+          echo "🏗️ Compiling project..."
+          gcc -Wall -Wextra -Werror -pedantic \
+            avl_trees/binary_tree_node.c \
+            avl_trees/binary_tree_print.c \
+            avl_trees/0-binary_tree_is_avl.c \
+            avl_trees/0-main.c \
+            -I avl_trees -o avl_trees/0-is_avl
+          echo "✅ Compilation successful"
+
+      - name: Run tests
+        run: |
+          echo "🚀 Running binary_tree_is_avl tests..."
+          ./avl_trees/0-is_avl || (echo "❌ Runtime error" && exit 1)
+          echo "✅ Program executed successfully"
+
+      - name: Validate output (basic pattern)
+        run: |
+          echo "🔎 Checking for expected AVL output pattern..."
+          ./avl_trees/0-is_avl | grep -Eq "Is [0-9]+ avl: [01]" \
+            && echo "✅ Output format OK" \
+            || (echo "❌ Unexpected output format" && exit 1)
