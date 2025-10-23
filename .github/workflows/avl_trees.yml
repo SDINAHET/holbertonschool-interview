@@ -29,10 +29,13 @@ jobs:
           test -f avl_trees/0-main.c || (echo "❌ Missing 0-main.c" && exit 1)
           echo "✅ All required files are present"
 
-      - name: Install dependencies (build tools)
+      - name: Install dependencies (build tools + Betty)
         run: |
           sudo apt update -y
-          sudo apt install -y build-essential betty
+          sudo apt install -y build-essential git
+          echo "⬇️ Installing Betty linter..."
+          git clone https://github.com/holbertonschool/Betty.git
+          cd Betty && sudo ./install.sh
 
       - name: Run Betty style check
         run: |
