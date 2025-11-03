@@ -58,6 +58,14 @@ jobs:
           diff -u pascal_triangle/_expected.txt pascal_triangle/_actual.txt
           echo "✅ Manual output check passed!"
 
+      - name: Debug tree
+        run: |
+          echo "::group::Repository tree"
+          ls -la
+          echo
+          find pascal_triangle -maxdepth 2 -type f -print
+          echo "::endgroup::"
+
       - name: Run unit tests (discover)
         run: |
           echo "🧪 Running unit tests..."
