@@ -92,10 +92,12 @@ jobs:
         shell: bash
         run: |
           # Sortie attendue 'sujet'
-          printf '%s\n' 1 1 1 1 1 1 1 0 1 1 0 0 > wild_cmp/_expected.txt
-          echo "🔎 Comparing output with expected (subject)..."
-          diff -u wild_cmp/_expected.txt wild_cmp/_actual.txt
-          echo "✅ Exact output match (subject)."
+          # Sortie attendue pour ces 13 cas (ordre identique au printf ci-dessus)
+          printf '%s\n' 1 1 1 1 1 1 1 0 1 1 0 0 1 > wild_cmp/_expected_checker.txt
+
+          echo "🔎 Comparing output with expected (checker-like)..."
+          diff -u wild_cmp/_expected_checker.txt wild_cmp/_actual_checker.txt
+          echo "✅ Exact output match (checker-like)."
 
       - name: Build and run checker-like cases
         shell: bash
