@@ -70,7 +70,7 @@ jobs:
         run: |
           echo "🧪 Running unit tests..."
           python -m unittest discover -s pascal_triangle/tests -p "test_*.py" -v
-          echo "✅ All unit tests passed!""
+          echo "✅ All unit tests passed!"
 
       - name: Success banner
         if: ${{ success() }}
