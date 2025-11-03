@@ -131,6 +131,72 @@ class TestPascalTriangle(unittest.TestCase):
                             for row in tri for x in row),
                         "All coefficients must be positive integers")
 
+    def test_15_correct_output_n5_explicit(self):
+        mod = load_solution_module()
+        expected = [
+            [1],
+            [1, 1],
+            [1, 2, 1],
+            [1, 3, 3, 1],
+            [1, 4, 6, 4, 1],
+        ]
+        self.assertEqual(mod.pascal_triangle(5), expected,
+                         "Correct output: n = 5")
+
+    def test_16_correct_output_n1_explicit(self):
+        mod = load_solution_module()
+        expected = [[1]]
+        self.assertEqual(mod.pascal_triangle(1), expected,
+                         "Correct output: n = 1")
+
+    def test_17_correct_output_n0_explicit(self):
+        mod = load_solution_module()
+        expected = []
+        self.assertEqual(mod.pascal_triangle(0), expected,
+                         "Correct output: n = 0")
+        # Bonus: n négatif doit aussi renvoyer []
+        self.assertEqual(mod.pascal_triangle(-1), expected,
+                         "Correct output: n = 0")
+
+    def test_18_correct_output_n10_explicit(self):
+        mod = load_solution_module()
+        tri = mod.pascal_triangle(10)
+        # Le triangle complet doit avoir 10 lignes
+        self.assertEqual(len(tri), 10, "Correct output: n = 10")
+        # Vérifie quelques lignes connues
+        self.assertEqual(tri[0], [1], "Correct output: n = 10")
+        self.assertEqual(tri[1], [1, 1], "Correct output: n = 10")
+        self.assertEqual(tri[2], [1, 2, 1], "Correct output: n = 10")
+        self.assertEqual(tri[4], [1, 4, 6, 4, 1], "Correct output: n = 10")
+        # Vérifie la dernière ligne via combinaisons C(9, k)
+        expected_last = [math.comb(9, k) for k in range(10)]
+        self.assertEqual(tri[-1], expected_last, "Correct output: n = 10")
+
+    def test_19_correct_output_n100_explicit(self):
+        mod = load_solution_module()
+        tri = mod.pascal_triangle(100)
+        # Nombre de lignes
+        self.assertEqual(len(tri), 100, "Correct output: n = 100")
+        # Structure de base
+        self.assertEqual(tri[0], [1], "Correct output: n = 100")
+        self.assertEqual(tri[1], [1, 1], "Correct output: n = 100")
+        self.assertTrue(all(r[0] == 1 and r[-1] == 1 for r in tri),
+                        "Correct output: n = 100")
+        # Dernière ligne (index 99) — vérifications ciblées C(99, k)
+        last = tri[-1]
+        self.assertEqual(len(last), 100, "Correct output: n = 100")
+        for k in (0, 1, 2, 50, 97, 98, 99):
+            self.assertEqual(last[k], math.comb(99, k),
+                             "Correct output: n = 100")
+        # Symétrie
+        for k in range(50):
+            self.assertEqual(last[k], last[-1 - k],
+                             "Correct output: n = 100")
+        # Tous entiers positifs
+        self.assertTrue(all(isinstance(x, int) and x > 0
+                            for row in tri for x in row),
+                        "Correct output: n = 100")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
