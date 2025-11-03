@@ -1,0 +1,70 @@
+name: Pascal Triangle CI
+
+on:
+  push:
+    paths:
+      - "pascal_triangle/**"
+      - ".github/workflows/pascal_triangle.yml"
+  pull_request:
+    paths:
+      - "pascal_triangle/**"
+      - ".github/workflows/pascal_triangle.yml"
+  workflow_dispatch:
+
+jobs:
+  lint-and-test:
+    name: Lint + Run (Python 3.10)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install lint tool
+        run: |
+          python -m pip install --upgrade pip
+          pip install pycodestyle
+
+      - name: Lint (pycodestyle)
+        run: |
+          pycodestyle pascal_triangle/*.py
+
+      - name: Ensure executables
+        run: |
+          chmod +x pascal_triangle/0-pascal_triangle.py || true
+          chmod +x pascal_triangle/0-main.py || true
+
+      - name: Run 0-main.py (or generate a minimal main if missing)
+        shell: bash
+        run: |
+          set -e
+          if [ ! -f "pascal_triangle/0-main.py" ]; then
+            printf '%s\n' \
+              '#!/usr/bin/python3' \
+              'pascal_triangle = __import__("0-pascal_triangle").pascal_triangle' \
+              'def print_triangle(triangle):' \
+              '    for row in triangle:' \
+              '        print("[{}]".format(",".join([str(x) for x in row])))' \
+              'if __name__ == "__main__":' \
+              '    print_triangle(pascal_triangle(5))' \
+              > pascal_triangle/0-main.py
+            chmod +x pascal_triangle/0-main.py
+          fi
+          python pascal_triangle/0-main.py > pascal_triangle/_actual.txt
+
+      - name: Validate exact output
+        shell: bash
+        run: |
+          printf '%s\n' \
+            "[1]" \
+            "[1,1]" \
+            "[1,2,1]" \
+            "[1,3,3,1]" \
+            "[1,4,6,4,1]" \
+            > pascal_triangle/_expected.txt
+          diff -u pascal_triangle/_expected.txt pascal_triangle/_actual.txt
