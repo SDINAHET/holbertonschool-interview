@@ -2,10 +2,18 @@ name: Run all tests (autodiscovery)
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ "**" ]     # déclenche sur push vers n'importe quelle branche
+    paths:    [ "**" ]     # déclenche quel que soit le dossier modifié
 
 permissions:
   actions: write
   contents: read
+
+# évite d'avoir plusieurs runs concurrents si tu pushes en rafale
+concurrency:
+  group: run-all-tests-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   trigger-all:
