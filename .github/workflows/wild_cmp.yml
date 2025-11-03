@@ -2,22 +2,44 @@ name: Wild Compare CI
 
 on:
   push:
+    # le job ne se déclenche que si AU MOINS un fichier correspond à ces patterns
     paths:
       - "wild_cmp/**"
       - ".github/workflows/wild_cmp.yml"
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "wild_cmp/**"
       - ".github/workflows/wild_cmp.yml"
+  # déclencheur manuel si tu veux forcer un run même si les paths ne matchent pas
+  workflow_dispatch:
 
 jobs:
   build:
     name: Wild Compare / Compile + Lint (C, Ubuntu 22.04)
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Debug – event & fichiers modifiés
+        run: |
+          echo "EVENT: $GITHUB_EVENT_NAME"
+          echo "BASE REF: ${{ github.base_ref }}"
+          echo "REF: ${{ github.ref }}"
+          echo "SHA: ${{ github.sha }}"
+          echo "---- CHANGED FILES ----"
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            git fetch --no-tags origin "refs/pull/${{ github.event.number }}/merge":pr-merge || true
+            # essaie de lister les fichiers de la PR
+            gh pr view ${{ github.event.number }} --json files -q '.files[].path' || true
+          else
+            git --no-pager diff --name-only ${{ github.event.before }}..${{ github.sha }} || true
+          fi
+          echo "------------------------"
 
       - name: Verify required files
         run: |
@@ -110,5 +132,3 @@ EOF
             echo "----------------"
             exit 1
           fi
-
-		  
