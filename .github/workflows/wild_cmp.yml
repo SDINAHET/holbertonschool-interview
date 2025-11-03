@@ -82,23 +82,22 @@ jobs:
           fi
           echo "✅ Compilation successful"
 
+      # ----- Séquence "sujet" -----
       - name: Run program (subject sequence)
         run: |
           echo "🚀 Running subject sequence..."
           ./wild_cmp/wild_cmp_test > wild_cmp/_actual.txt
           echo "✅ Program executed successfully"
 
-      - name: Validate EXACT output (12 lines)
+      - name: Validate EXACT output (12 lines, subject)
         shell: bash
         run: |
-          # Sortie attendue 'sujet'
-          # Sortie attendue pour ces 13 cas (ordre identique au printf ci-dessus)
-          printf '%s\n' 1 1 1 1 1 1 1 0 1 1 0 0 1 > wild_cmp/_expected_checker.txt
+          printf '%s\n' 1 1 1 1 1 1 1 0 1 1 0 0 > wild_cmp/_expected.txt
+          echo "🔎 Comparing output with expected (subject)..."
+          diff -u wild_cmp/_expected.txt wild_cmp/_actual.txt
+          echo "✅ Exact output match (subject)."
 
-          echo "🔎 Comparing output with expected (checker-like)..."
-          diff -u wild_cmp/_expected_checker.txt wild_cmp/_actual_checker.txt
-          echo "✅ Exact output match (checker-like)."
-
+      # ----- Séquence "checker-like" -----
       - name: Build and run checker-like cases
         shell: bash
         run: |
@@ -130,10 +129,13 @@ jobs:
             -I wild_cmp -o wild_cmp/_checker
 
           ./wild_cmp/_checker > wild_cmp/_actual_checker.txt
+          echo "✅ Checker-like program executed."
 
-          # Sortie attendue pour ces 13 cas (ordre identique au printf ci-dessus)
-          printf '%s\n' 1 1 1 1 1 1 1 0 1 1 0 1 1 > wild_cmp/_expected_checker.txt
-
+      - name: Validate output (checker-like, 13 lines)
+        shell: bash
+        run: |
+          # Séquence correcte (pour 'def', '*e' => 0)
+          printf '%s\n' 1 1 1 1 1 1 1 0 1 1 0 0 1 > wild_cmp/_expected_checker.txt
           echo "🔎 Comparing output with expected (checker-like)..."
           diff -u wild_cmp/_expected_checker.txt wild_cmp/_actual_checker.txt
           echo "✅ Exact output match (checker-like)."
