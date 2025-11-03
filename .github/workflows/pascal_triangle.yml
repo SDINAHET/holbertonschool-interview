@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - "pascal_triangle/**"
+      - "tests/**"
       - ".github/workflows/pascal_triangle.yml"
   pull_request:
     paths:
       - "pascal_triangle/**"
+      - "tests/**"
       - ".github/workflows/pascal_triangle.yml"
   workflow_dispatch:
 
@@ -30,6 +32,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install pycodestyle
 
+      - name: Verify required files
+        run: |
+          test -f pascal_triangle/0-pascal_triangle.py || (echo "❌ Missing pascal_triangle/0-pascal_triangle.py" && exit 1)
+          test -f pascal_triangle/0-main.py || (echo "❌ Missing pascal_triangle/0-main.py" && exit 1)
+          test -f pascal_triangle/tests/test_pascal_triangle.py || (echo "❌ Missing pascal_triangle/tests/test_pascal_triangle.py" && exit 1)
+          echo "✅ All required files are present"
+
       - name: Lint (PEP8)
         run: |
           pycodestyle pascal_triangle/*.py
@@ -49,11 +58,10 @@ jobs:
           diff -u pascal_triangle/_expected.txt pascal_triangle/_actual.txt
           echo "✅ Manual output check passed!"
 
-      - name: Run unit tests
-        shell: bash
+      - name: Run unit tests (discover)
         run: |
-          echo "🧪 Running test_pascal_triangle.py..."
-          python -m unittest -v pascal_triangle.tests.test_pascal_triangle
+          echo "🧪 Running unit tests..."
+          python -m unittest -v discover -s pascal_triangle/tests -p "test_*.py"
           echo "✅ All unit tests passed!"
 
       - name: Success banner
