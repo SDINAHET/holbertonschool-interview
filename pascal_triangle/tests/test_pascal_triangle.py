@@ -21,7 +21,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
-SOL_PATH = ROOT / "pascal_triangle" / "0-pascal_triangle.py"
+SOL_PATH = ROOT / "0-pascal_triangle.py"
 MODULE_NAME = "pascal_triangle_module"
 
 
