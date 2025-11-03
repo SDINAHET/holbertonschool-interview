@@ -18,12 +18,10 @@ jobs:
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
 
-            // ref sûre (ex: main, develop, …)
             const refName = process.env.GITHUB_REF_NAME
               || (context.ref || '').replace('refs/heads/', '')
               || 'main';
 
-            // Lister tous les workflows (renvoie directement un array de workflows)
             const workflows = await github.paginate(
               github.rest.actions.listRepoWorkflows,
               { owner, repo, per_page: 100 }
@@ -31,7 +29,6 @@ jobs:
 
             const thisWorkflowName = process.env.GITHUB_WORKFLOW;
 
-            // helper: récupère le contenu YAML pour vérifier la présence de workflow_dispatch
             async function hasWorkflowDispatch(path) {
               try {
                 const res = await github.rest.repos.getContent({ owner, repo, path });
@@ -44,7 +41,6 @@ jobs:
               }
             }
 
-            // Filtrer les candidats actifs, pas ce lanceur, et situés dans .github/workflows
             const active = workflows.filter(wf =>
               wf.state === 'active' &&
               wf.path?.startsWith('.github/workflows/') &&
@@ -65,15 +61,15 @@ jobs:
               try {
                 await github.rest.actions.createWorkflowDispatch({
                   owner, repo,
-                  workflow_id: wf.id,  // ID numérique = plus fiable
+                  workflow_id: wf.id,
                   ref: refName
                 });
-                core.info(`✅ Dispatched: ${wf.name} (id=${wf.id}) on ref: ${refName}`);
+                core.info(`✅ Dispatched: ${wf.name} on ref: ${refName}`);
                 dispatched++;
               } catch (e) {
-                core.warning(`⚠️ Failed: ${wf.name} (id=${wf.id}) → ${e.status || ''} ${e.message}`);
+                core.warning(`⚠️ Failed: ${wf.name} → ${e.status || ''} ${e.message}`);
                 failed++;
               }
             }
 
-            core.info(`Summary → dispatched=${dispatched}, skipped(no dispatch trigger)=${skipped}, failed=${failed}`);
+            core.info(`Summary → dispatched=${dispatched}, skipped=${skipped}, failed=${failed}`);
