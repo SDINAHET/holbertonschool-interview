@@ -2,16 +2,13 @@ name: Wild Compare CI
 
 on:
   push:
-    # le job ne se déclenche que si AU MOINS un fichier correspond à ces patterns
     paths:
       - "wild_cmp/**"
       - ".github/workflows/wild_cmp.yml"
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - "wild_cmp/**"
       - ".github/workflows/wild_cmp.yml"
-  # déclencheur manuel si tu veux forcer un run même si les paths ne matchent pas
   workflow_dispatch:
 
 jobs:
@@ -24,22 +21,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Debug – event & fichiers modifiés
-        run: |
-          echo "EVENT: $GITHUB_EVENT_NAME"
-          echo "BASE REF: ${{ github.base_ref }}"
-          echo "REF: ${{ github.ref }}"
-          echo "SHA: ${{ github.sha }}"
-          echo "---- CHANGED FILES ----"
-          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-            git fetch --no-tags origin "refs/pull/${{ github.event.number }}/merge":pr-merge || true
-            # essaie de lister les fichiers de la PR
-            gh pr view ${{ github.event.number }} --json files -q '.files[].path' || true
-          else
-            git --no-pager diff --name-only ${{ github.event.before }}..${{ github.sha }} || true
-          fi
-          echo "------------------------"
 
       - name: Verify required files
         run: |
@@ -73,62 +54,84 @@ jobs:
               wild_cmp/0-wildcmp.c wild_cmp/0-main.c \
               -I wild_cmp -o wild_cmp/wild_cmp_test
           else
-cat > wild_cmp/_stub_main.c <<'EOF'
-#include "holberton.h"
-#include <stdio.h>
-int main(void)
-{
-    printf("%d\n", wildcmp("main.c", "*.c"));
-    printf("%d\n", wildcmp("main.c", "m*a*i*n*.*c*"));
-    printf("%d\n", wildcmp("main.c", "main.c"));
-    printf("%d\n", wildcmp("main.c", "m*c"));
-    printf("%d\n", wildcmp("main.c", "ma********************************c"));
-    printf("%d\n", wildcmp("main.c", "*"));
-    printf("%d\n", wildcmp("main.c", "***"));
-    printf("%d\n", wildcmp("main.c", "m.*c"));
-    printf("%d\n", wildcmp("main.c", "**.*c"));
-    printf("%d\n", wildcmp("main-main.c", "ma*in.c"));
-    printf("%d\n", wildcmp("main", "main*d"));
-    printf("%d\n", wildcmp("abc", "*b"));
-    return (0);
-}
-EOF
+            # Génère _stub_main.c sans heredoc
+            printf '%s\n' \
+              '#include "holberton.h"' \
+              '#include <stdio.h>' \
+              'int main(void)' \
+              '{' \
+              '    printf("%d\n", wildcmp("main.c", "*.c"));' \
+              '    printf("%d\n", wildcmp("main.c", "m*a*i*n*.*c*"));' \
+              '    printf("%d\n", wildcmp("main.c", "main.c"));' \
+              '    printf("%d\n", wildcmp("main.c", "m*c"));' \
+              '    printf("%d\n", wildcmp("main.c", "ma********************************c"));' \
+              '    printf("%d\n", wildcmp("main.c", "*"));' \
+              '    printf("%d\n", wildcmp("main.c", "***"));' \
+              '    printf("%d\n", wildcmp("main.c", "m.*c"));' \
+              '    printf("%d\n", wildcmp("main.c", "**.*c"));' \
+              '    printf("%d\n", wildcmp("main-main.c", "ma*in.c"));' \
+              '    printf("%d\n", wildcmp("main", "main*d"));' \
+              '    printf("%d\n", wildcmp("abc", "*b"));' \
+              '    return (0);' \
+              '}' \
+              > wild_cmp/_stub_main.c
+
             gcc -Wall -Wextra -Werror -pedantic \
               wild_cmp/0-wildcmp.c wild_cmp/_stub_main.c \
               -I wild_cmp -o wild_cmp/wild_cmp_test
           fi
           echo "✅ Compilation successful"
 
-      - name: Run program
+      - name: Run program (subject sequence)
         run: |
-          echo "🚀 Running tests..."
+          echo "🚀 Running subject sequence..."
           ./wild_cmp/wild_cmp_test > wild_cmp/_actual.txt
           echo "✅ Program executed successfully"
 
-      - name: Validate EXACT output (12 lines, must match the subject)
+      - name: Validate EXACT output (12 lines)
         shell: bash
         run: |
-cat > wild_cmp/_expected.txt <<'EOF'
-1
-1
-1
-1
-1
-1
-1
-0
-1
-1
-0
-0
-EOF
-          echo "🔎 Comparing output with expected..."
-          if diff -u wild_cmp/_expected.txt wild_cmp/_actual.txt; then
-            echo "✅ Exact output match."
-          else
-            echo "❌ Output differs from expected (see diff above)."
-            echo "---- ACTUAL ----"
-            cat wild_cmp/_actual.txt || true
-            echo "----------------"
-            exit 1
-          fi
+          # Sortie attendue 'sujet'
+          printf '%s\n' 1 1 1 1 1 1 1 0 1 1 0 0 > wild_cmp/_expected.txt
+          echo "🔎 Comparing output with expected (subject)..."
+          diff -u wild_cmp/_expected.txt wild_cmp/_actual.txt
+          echo "✅ Exact output match (subject)."
+
+      - name: Build and run checker-like cases
+        shell: bash
+        run: |
+          # Génère un main de tests 'checker-like' sans heredoc
+          printf '%s\n' \
+            '#include "holberton.h"' \
+            '#include <stdio.h>' \
+            'int main(void)' \
+            '{' \
+            '    printf("%d\n", wildcmp("holberton.c", "*.c"));' \
+            '    printf("%d\n", wildcmp("holberton.c", "*h*o*l*b*e*r*t*o*n*.*c*"));' \
+            '    printf("%d\n", wildcmp("holberton.c", "holberton.c"));' \
+            '    printf("%d\n", wildcmp("holberton.c", "h*c"));' \
+            '    printf("%d\n", wildcmp("holberton.c", "hol********************************c"));' \
+            '    printf("%d\n", wildcmp("holberton.c", "*"));' \
+            '    printf("%d\n", wildcmp("holberton.c", "***"));' \
+            '    printf("%d\n", wildcmp("holberton.c", "h.*c"));' \
+            '    printf("%d\n", wildcmp("holberton.c", "**.*c"));' \
+            '    printf("%d\n", wildcmp("holberton-holberton.c", "holbe*rton.c"));' \
+            '    printf("%d\n", wildcmp("holberton", "holberton*d"));' \
+            '    printf("%d\n", wildcmp("def", "*e"));' \
+            '    printf("%d\n", wildcmp("", "*"));' \
+            '    return (0);' \
+            '}' \
+            > wild_cmp/_checker_main.c
+
+          gcc -Wall -Wextra -Werror -pedantic \
+            wild_cmp/0-wildcmp.c wild_cmp/_checker_main.c \
+            -I wild_cmp -o wild_cmp/_checker
+
+          ./wild_cmp/_checker > wild_cmp/_actual_checker.txt
+
+          # Sortie attendue pour ces 13 cas (ordre identique au printf ci-dessus)
+          printf '%s\n' 1 1 1 1 1 1 1 0 1 1 0 1 1 > wild_cmp/_expected_checker.txt
+
+          echo "🔎 Comparing output with expected (checker-like)..."
+          diff -u wild_cmp/_expected_checker.txt wild_cmp/_actual_checker.txt
+          echo "✅ Exact output match (checker-like)."
