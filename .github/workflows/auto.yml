@@ -1,0 +1,66 @@
+name: Run all tests (autodiscovery)
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_self:
+        description: "Inclure ce workflow dans la boucle ?"
+        type: boolean
+        default: false
+
+permissions:
+  actions: write      # nécessaire pour déclencher d'autres workflows
+  contents: read
+
+jobs:
+  trigger-all:
+    name: Dispatch every test workflow
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: List and dispatch each workflow having workflow_dispatch
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+
+            // 1) Lister tous les workflows du repo
+            const workflows = await github.paginate(
+              github.rest.actions.listRepoWorkflows,
+              { owner, repo, per_page: 100 }
+            );
+
+            core.info(`Found ${workflows.length} workflows in the repo.`);
+
+            // 2) Exclure ce workflow si demandé
+            const thisPath = process.env.GITHUB_WORKFLOW_REF?.split('@')[0]  // ".github/workflows/run_all_tests.yml"
+                           || ".github/workflows/run_all_tests.yml";
+            const includeSelf = core.getInput('include_self') === 'true';
+
+            // 3) Filtrer: actifs, dans .github/workflows/, et différents de celui-ci (sauf si include_self)
+            const candidates = workflows.filter(wf => {
+              const inWorkflowsFolder = wf.path?.startsWith(".github/workflows/");
+              const notSelf = includeSelf ? true : wf.path !== thisPath;
+              const active = wf.state === "active";
+              return inWorkflowsFolder && notSelf && active;
+            });
+
+            core.info(`Dispatching ${candidates.length} workflows...`);
+
+            // 4) Les déclencher via workflow_dispatch
+            for (const wf of candidates) {
+              try {
+                await github.rest.actions.createWorkflowDispatch({
+                  owner,
+                  repo,
+                  // On peut utiliser le chemin du fichier YAML pour identifier le workflow
+                  workflow_id: wf.path,  // ex: ".github/workflows/avl_trees.yml"
+                  ref: context.ref       // branche/commit courant
+                });
+                core.info(`Dispatched: ${wf.name} (${wf.path})`);
+              } catch (err) {
+                core.warning(`Failed to dispatch ${wf.path}: ${err.message}`);
+              }
+            }
+            core.info("All dispatch requests sent.");
