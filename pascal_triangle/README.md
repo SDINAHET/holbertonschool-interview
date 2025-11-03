@@ -223,4 +223,26 @@ root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonscho
 iangle#
 
 
+root@UID7E:/mnt/d/Users/steph/Documents/4ème_trimestre_speFS/algo/holbertonschool-interview/pascal_tr
+iangle# python3 -m unittest -v tests.test_pascal_triangle -v
+test_00_file_exists (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_01_shebang (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_02_no_imports (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_03_module_and_function_docstrings (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_10_correct_output_n5 (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_11_correct_output_n1 (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_12_correct_output_n0 (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_13_correct_output_n10 (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_14_correct_output_n100 (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_15_correct_output_n5_explicit (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_16_correct_output_n1_explicit (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_17_correct_output_n0_explicit (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_18_correct_output_n10_explicit (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+test_19_correct_output_n100_explicit (tests.test_pascal_triangle.TestPascalTriangle) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.387s
+
+OK
+
 ```
