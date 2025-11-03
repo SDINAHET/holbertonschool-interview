@@ -1,0 +1,109 @@
+name: Wild Compare CI
+
+on:
+  push:
+    paths:
+      - "wild_cmp/**"
+      - ".github/workflows/wild_cmp.yml"
+  pull_request:
+    paths:
+      - "wild_cmp/**"
+      - ".github/workflows/wild_cmp.yml"
+
+jobs:
+  build:
+    name: Wild Compare / Compile + Lint (C, Ubuntu 22.04)
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify required files
+        run: |
+          test -d wild_cmp || (echo "❌ Missing wild_cmp directory" && exit 1)
+          test -f wild_cmp/0-wildcmp.c || (echo "❌ Missing 0-wildcmp.c" && exit 1)
+          test -f wild_cmp/holberton.h || (echo "❌ Missing holberton.h" && exit 1)
+          echo "✅ All required files are present"
+
+      - name: Install dependencies (build tools + Betty)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y build-essential git
+          echo "⬇️ Installing Betty linter..."
+          git clone https://github.com/holbertonschool/Betty.git
+          cd Betty && sudo ./install.sh
+          echo "✅ Betty installed"
+
+      - name: Run Betty style check
+        run: |
+          echo "🔎 Running Betty..."
+          betty wild_cmp/*.c wild_cmp/*.h || (echo "❌ Betty style errors found" && exit 1)
+          echo "✅ Betty style passed"
+
+      - name: Compile (prefer 0-main.c if present)
+        run: |
+          set -e
+          echo "🏗️ Compiling with -Wall -Werror -Wextra -pedantic"
+          if [ -f "wild_cmp/0-main.c" ]; then
+            gcc -Wall -Wextra -Werror -pedantic \
+              wild_cmp/0-wildcmp.c wild_cmp/0-main.c \
+              -I wild_cmp -o wild_cmp/wild_cmp_test
+          else
+            # Minimal stub main matching the subject's example sequence (12 lines)
+            cat > wild_cmp/_stub_main.c <<'EOF'
+            #include "holberton.h"
+            #include <stdio.h>
+            int main(void)
+            {
+                printf("%d\n", wildcmp("main.c", "*.c"));
+                printf("%d\n", wildcmp("main.c", "m*a*i*n*.*c*"));
+                printf("%d\n", wildcmp("main.c", "main.c"));
+                printf("%d\n", wildcmp("main.c", "m*c"));
+                printf("%d\n", wildcmp("main.c", "ma********************************c"));
+                printf("%d\n", wildcmp("main.c", "*"));
+                printf("%d\n", wildcmp("main.c", "***"));
+                printf("%d\n", wildcmp("main.c", "m.*c"));
+                printf("%d\n", wildcmp("main.c", "**.*c"));
+                printf("%d\n", wildcmp("main-main.c", "ma*in.c"));
+                printf("%d\n", wildcmp("main", "main*d"));
+                printf("%d\n", wildcmp("abc", "*b"));
+                return (0);
+            }
+            EOF
+            gcc -Wall -Wextra -Werror -pedantic \
+              wild_cmp/0-wildcmp.c wild_cmp/_stub_main.c \
+              -I wild_cmp -o wild_cmp/wild_cmp_test
+          fi
+          echo "✅ Compilation successful"
+
+      - name: Run program
+        run: |
+          echo "🚀 Running tests..."
+          ./wild_cmp/wild_cmp_test > wild_cmp/_actual.txt
+          echo "✅ Program executed successfully"
+
+      - name: Validate EXACT output (12 lines, must match the subject)
+        run: |
+          cat > wild_cmp/_expected.txt <<'EOF'
+          1
+          1
+          1
+          1
+          1
+          1
+          1
+          0
+          1
+          1
+          0
+          0
+          EOF
+
+          echo "🔎 Comparing output with expected..."
+          if diff -u wild_cmp/_expected.txt wild_cmp/_actual.txt; then
+            echo "✅ Exact output match."
+          else
+            echo "❌ Output differs from expected (see diff above)."
+            exit 1
+          fi
