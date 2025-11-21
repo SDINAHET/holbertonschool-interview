@@ -64,7 +64,7 @@ static int build_word_info(char const **words, int nb_words,
  * Return: index in uniq_words, or -1 if not found
  */
 static int find_word_index(char const *s, char const **uniq_words,
-                int uniq_nb, int word_len)
+				int uniq_nb, int word_len)
 {
 	int i;
 
@@ -87,7 +87,7 @@ static int find_word_index(char const *s, char const **uniq_words,
  * Return: malloc'ed array of indices, or NULL if none (or on error).
  */
 int *find_substring(char const *s, char const **words,
-		    int nb_words, int *n)
+			int nb_words, int *n)
 {
 	int *indices = NULL;
 	int len_s, word_len, total_len;
@@ -113,7 +113,7 @@ int *find_substring(char const *s, char const **words,
 		return (NULL);
 
 	if (build_word_info(words, nb_words, &uniq_words,
-                &uniq_count, &uniq_nb) == -1)
+				&uniq_count, &uniq_nb) == -1)
 		return (NULL);
 
 	cur_count = malloc(sizeof(int) * uniq_nb);
